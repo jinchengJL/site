@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practical Hash Tables | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Practical Hash Tables</span></h1>
+
+<h2 class="date">2021/08/08</h2>
+</div>
+
+<main>
+<p>This is a quick review of hash tables and some musings about their performance. The article was written in 2021, around the first time I needed to really pay attention to the performance and detailed design of hash tables. It comes off as fairly rudimentary to me now, and probably to you too if you know anything about performance optimization or CPU architecture. Please be warned.</p>
+<h2 id="hash-tables-from-the-outside">Hash tables: from the outside</h2>
+<p>Most languages come with standard library implementations of hash tables, usually presented as an associative array of (key, value) pairs. They support amortized constant-time lookup, insertion, removal of a key, and also iteration through all stored (key, value) pairs.</p>
+<p>Beyond the basics, there are two common gotchas:</p>
+<ul>
+<li>Iteration order. The iteration order guarantees of a hash table vary by implementation - relying on a deterministic iteration order when not explicitly specified in the contract is often a source of subtle bugs.</li>
+<li>Pointer stability. In a language that exposes pointers like C++, pointers (and iterators) to elements in the hash table may or may not be invalidated by rehashing. Again, one should be careful not to rely on such properties unless specified.</li>
+</ul>
+<h2 id="hash-tables-the-internals">Hash tables: the internals</h2>
+<p>Internally, hash tables typically allocate a contiguous array of hash buckets for storage. Elements are assigned to buckets based on their hash value. A hash collision occurs when multiple elements hash to the same bucket. Practically speaking, there are two primary differentiators for the performance of a hash table: the choice of hash function, and the collision resolution scheme.</p>
+<p>Hash function quality is not strictly a property of the hash table, but it is vitally important in practice. It dictates how often hash collisions occur, and collisions destroy performance. Choosing a good hash function is half the battle to get a well-behaved hash table. This burden is often shared between the user and the library. While the default hash functions of a language or library are often good, it may not be as efficient as possible due to its general-purpose nature, or it may perform badly on a custom data type. For performance-critical code, it pays to evaluate hash functions for the specific use case needed.</p>
+<p>Beyond hash functions, the collision resolution scheme determines how collisions are handled, and also informs the internal data layout of the table. Collision resolution comes in two flavors: <em>separate chaining</em> and <em>open addressing</em>.</p>
+<ul>
+<li>In separate chaining, each bucket contains a list. Colliding entries are placed on the list, and lookup traverses through the list until a match is found. The simplest choice for this list is a uni-directional linked list.</li>
+<li>In open addressing, each bucket stores a single entry. Colliding entries are placed in different buckets of the hash table. The bucket is determined by starting with the hashed-to bucket, and then <em>probing</em> for an available bucket in an algorithmically defined sequence.</li>
+</ul>
+<p>Many variations of the above strategies exist. In particular, there is <a href="https://en.wikipedia.org/wiki/Hash_table#Open_addressing">a variety of probing schemes</a>.</p>
+<h3 id="load-factor-and-resizing">Load factor and resizing</h3>
+<p>When talking about collision resolution, <em>load factor</em> comes up a lot. It refers to the ratio between the number of elements and number of buckets in a hash table. A higher load factor usually means there are more collisions in the hash table, and growing the table would help reduce collisions and improve performance. Some probing techniques (e.g. Robin Hood Hashing, Hopscotch Hashing) help avoid long probe chains, and therefore enable hash tables with very high load factors to still perform well.</p>
+<p>General-purpose hash tables usually grow and shrink to keep the load factor within a certain range. It&rsquo;s useful to note that if one can determine the maximum storage requirements of a hash table, or stop storing data into the hash table when the load factor becomes high, then resizing is unnecessary. Resizing can even be harmful because it worsens tail latency.</p>
+<h3 id="one-algorithm-to-rule-them-all">One algorithm to rule them all?</h3>
+<p>There are <a href="https://rcoh.me/posts/hash-map-analysis/">many different hash table implementations</a> in the standard libraries of different languages, so there isn&rsquo;t really a clear and fast rule on which algorithm to use. However, I&rsquo;d like to focus on one particular, simple approach taken by open-source general-purpose implementations in recent years: open addressing with <em>linear probing</em>, where adjacent hash buckets are simply probed one by one. Examples are <a href="https://abseil.io/blog/20180927-swisstables">Google&rsquo;s Swisstable</a> (<a href="https://www.youtube.com/watch?v=ncHmEUmJZf4">talk</a>), Rust&rsquo;s <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html">std::collections::HashMap</a> (based on Swisstable), and <a href="https://engineering.fb.com/2019/04/25/developer-tools/f14">Facebook&rsquo;s F14</a>. Why the sudden popularity of linear probing?</p>
+<p>My guess: a combination of cache-friendliness and SIMD operations. Let&rsquo;s step back and talk about performance.</p>
+<h2 id="performance-101">Performance 101</h2>
+<p>I&rsquo;m only starting to scratch the surface of program optimization, and there are many cautions in the wild about premature optimization, but this topic is increasingly relevant in a world where Moore&rsquo;s law is slowing down, and hardware resource efficiency is emphasized.</p>
+<p>Performance analysis often starts with big-O, but it&rsquo;s only a first step in understanding performance. It helps one avoid big-picture mistakes like using a quadratic algorithm when sorting + a linear scan is sufficient, but doesn&rsquo;t say anything about constant factors which can be huge, and misleads one into thinking that linked lists and binary trees are decent data structures (they&rsquo;re not; see below).</p>
+<p>So, what aspects of an algorithm or data structure affect its performance beyond big-O complexity?</p>
+<p>Generally, how it interacts with computer hardware. Hardware is built to optimize certain patterns of computation, and by taking advantage of these patterns, an algorithm can be orders of magnitude more efficient than an otherwise similar algorithm that do not.</p>
+<p>In the domain of single-threaded, in-memory computing (the scope of this article), the most prominent limiting factor of performance is the <a href="https://en.wikipedia.org/wiki/Random-access_memory#Memory_wall">&ldquo;memory wall&rdquo;</a> - the fact that RAM latency has become overwhelmingly high compared to CPU cycle latency. Modern CPUs remedy this with multi-level (typically 3) cache hierarchies. CPU cache is generally much closer to the CPU than RAM, and performs much better. You may have seen <a href="https://gist.github.com/hellerbarde/2843375">a list of latency numbers</a> illustrating this - L1 cache reference (0.5ns) is <em>two</em> orders of magnitudes faster than main memory reference (100ns). On a 4GHz CPU, the difference is 2 cycles for L1 vs 200 cycles for RAM. Without other optimizations, the CPU could be spinning idle for 200 cycles every time a hash table slot is read.</p>
+<p>What this means in practice is that, when operating completely in-memory (e.g. hash tables in standard libraries), to achieve good performance, one must do everything possible to avoid cache misses. Chandler Carruth <a href="https://www.youtube.com/watch?v=fHNmRkzxHWs">summarized</a> this point succinctly:</p>
+<blockquote>
+<p>Dis-contiguous data structures are the root of all performance evil. Say no to linked lists.</p>
+</blockquote>
+<p>Caching is also not the only hardware optimization done to hide memory latency. Here are a few others I&rsquo;ve learned about:</p>
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Out-of-order_execution#In-order_processors">Out-of-order execution</a></p>
+<p>Modern CPUs execute instructions out of program order, depending on when data becomes available. Each CPU core maintains an <a href="https://en.wikipedia.org/wiki/Instruction_pipelining">instruction pipeline</a> and executes instructions from the pipeline as instructions and their associated data become ready. As a result, for example, a CPU core may execute several iterations of a for-loop in parallel, even though by program order an iteration shouldn&rsquo;t happen until the previous one is done.</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Speculative_execution">Speculative execution</a></p>
+<p>This is an umbrella term for many different optimizations, and a source of security vulnerabilities in recent years. One example is <a href="https://en.wikipedia.org/wiki/Branch_predictor">branch prediction</a>, where the CPU tries to predict the outcome of an if-else block before the conditional expression is evaluated, and preemptively executes the predicted branch.</p>
+</li>
+</ul>
+<h2 id="hash-tables-again">Hash tables again</h2>
+<p>One primary advantage of open-addressing with linear probing is its cache-friendliness (or cache locality). In particular, modern processors have 64-byte or 128-byte cache lines. When a memory location is fetched, the entire cache line containing that location is fetched. Thus, the cost to traverse, say, 4 bytes of memory, is comparable to traversing 64 bytes - both much less than traversing the same amount of data by repeatedly chasing pointers to random memory locations. A data structure with a contiguous storage layout takes advantage of cache locality a lot better than dis-contiguous ones.</p>
+<p>Consider a separate chaining hash table with a linked list in each bucket. This has the same big-O complexity as a hash table with open addressing. However, traversing each step of the linked list is a RAM reference, and each step requires the previous read to be completely done first. This translates to anywhere between 2 to N RAM references for a lookup, where N is the maximum number of elements in a bucket (minimum is 2 assuming the head of the linked list is not stored directly in the bucket). Compare this with linear probing, where one read is needed to find the bucket, and subsequent linear probing is ~free until we go over a cache line boundary - if elements are small, the chances of doing more than 1 or 2 RAM references is minimal.</p>
+<p>An additional optimization that linear probing is amenable to is SIMD, as explained in more detail in the talks and blog posts linked above. Briefly, one can group N buckets together, and store a subset of the hash code (say, 8 out of 64 bits) per bucket as metadata, such that the resulting metadata per group has 8 * N bits. Then, a set of SIMD instructions can operate on all of those bits at once, probing many buckets in just a few cycles.</p>
+<p>Naive linear probing suffers from the problem of long probe chains when load factor becomes high. The SIMD optimization seems to have mostly mitigated this shortcoming. This would explain why earlier hash table implementations (Python, Ruby) chose to use probing sequences with a constant multiplicative factor + perturbation, while recent implementations opt for the simpler linear probing.</p>
+<h3 id="aside-databases">Aside: databases</h3>
+<p>As hinted in the above analysis, one way to think about optimizing a program is to &ldquo;count memory references&rdquo;. More accurately, if the data fits entirely into cache, count instructions, otherwise count memory references.</p>
+<p>This is strikingly similar to how query optimizers of traditional on-disk databases evaluate the cost of a query, except memory references are replaced by disk reads. Magnetic hard drives are orders of magnitudes slower than RAM, so when evaluating a query execution plan, it&rsquo;s often effective to count the number of disk reads it does.</p>
+<p>I think this is also an argument for why B-Trees, the preferred data structure of databases, can be the right data structure for in-memory data when ordering is required, despite hash tables being the <a href="www.evanjones.ca/ordered-vs-unordered-indexes.html">go-to solution</a> when associative arrays are needed.</p>
+
+</main>
+
+  <footer>
+  
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4B68JJFZ6W', { 'anonymize_ip': false });
+}
+</script>
+
+
+  
+  <hr/>
+  © 2024 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The C&#43;&#43; Memory Model, or Why We Can&#39;t Have Nice Things | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">The C++ Memory Model, or Why We Can&rsquo;t Have Nice Things</span></h1>
+
+<h2 class="date">2022/05/28</h2>
+</div>
+
+<main>
+<p>This post gives a brief overview of the memory model problem, its history, and the approach taken by C++. Memory models are a <a href="/post/mm-warnings/">notoriously difficult</a> subject justifying book-length introductions, so many details are left out - I consider this post a refresher on the topic with links to relevant literature. Please see referenced materials in footnotes for a more serious introduction.</p>
+<h2 id="the-problem">The Problem</h2>
+<p>Here&rsquo;s an over-simplified mental model of how a C++ program is executed on a computer:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>     compiler              CPU(s)
+</span></span><span style="display:flex;"><span>C++ -----------&gt; assembly --------&gt; memory reads/writes
+</span></span></code></pre></div><p>While not particularly accurate, it calls to attention the two steps of transformation a program goes through before operating on memory: the compiler, and the CPU. On modern computers, both steps may re-order memory operations in the original the program, in order to optimize its performance. Compilers achieve this through literal program transformation, emitting assembly instructions out of order with respect to the original program. CPUs achieve this either directly by executing instructions <a href="https://en.wikipedia.org/wiki/Out-of-order_execution">out-of-order</a>, or indirectly through the use of per-core caches and <a href="https://en.wikipedia.org/wiki/Write_buffer">write buffers</a>.</p>
+<p>Such re-ordering has to follow certain rules to preserve the correctness of the program. On uniprocessor systems, the rule is simple - the optimized execution of a program must have the same observable behavior as a non-optimized, statement-by-statement sequential execution. In other words, the optimized program must provide the illusion of sequential execution. This rule provides programmers the ability to reason about a program without knowledge of the mountain of optimizations it goes through.</p>
+<p>Unfortunately, the world has moved beyond uniprocessor architectures. <a href="https://en.wikipedia.org/wiki/Symmetric_multiprocessing">Symmetric Multiprocessing</a> (SMP) systems existed in the 1960s, and the <a href="https://en.wikipedia.org/wiki/POWER4">first commercially available multi-processor</a> CPU was released in 2001. Any computer manufactured after 2010 is likely to have multiple CPU cores. Here, I&rsquo;m using SMP to loosely refer to any system where all CPU cores share the same view of memory, including architectures like <a href="https://en.wikipedia.org/wiki/Non-uniform_memory_access">NUMA</a>. Shared memory makes coordination among processor cores easy - one may simply access the same variable from threads running on different cores - but also makes it possible for one core to observe the memory effects of another core&rsquo;s possibly out-of-order instructions. The sequential execution illusion is on longer &ldquo;free&rdquo; - extra measures must be taken if we want to preserve it.</p>
+<p>This is really a cross-cutting concern for two separate systems - the hardware (i.e. the combination of CPU, cache, memory module, etc), and the compiler (i.e. the high-level programming language). In order to support multi-threading on a multi-core architecture, both the hardware and the language have to specify how memory operations behave when shared variables are accessed from multiple threads. In addition, this specification had better hide the implementation details of the hardware and the compiler, so that programmers can continue to reason about their programs. This is the problem addressed by memory models.</p>
+<h2 id="the-theory">The Theory</h2>
+<p>This is not a new problem. Much research has already gone into writing correct multi-threaded programs on multi-core computers. Intuitively, when accessing shared memory in a multi-threaded program, we&rsquo;d still like each memory operation from a single thread to happen atomically, so a correct execution of a multi-threaded program should be some interleaving of operations from each thread. Lamport formalized this condition as sequential consistency<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>:</p>
+<blockquote>
+<p>&hellip; the result of any execution is the same as if the operations of all the processors were executed in some sequential order, and the operations of each individual processor appear in this sequence in the order specified by its program.</p>
+</blockquote>
+<p>Things would be simpler if we stopped here and enforced that hardware and programming languages must maintain the illusion of SC. Unfortunately, guaranteeing sequential consistency unconditionally is prohibitively expensive, ruling out fundamental optimizations like write buffers<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+<p>Researchers realized that we can divide memory operations into <em>synchronization operations</em> used to order events across cores, and other operations that read or write data. By communicating synchronization operations explicitly to hardware, we enable optimizations to be applied to &ldquo;data&rdquo; operations, achieving higher performance. This, combined with a desire to define a formal contract between software and hardware, led to the Data-Race-Free-0 (SC-DRF0) synchronization model<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>:</p>
+<blockquote>
+<p>A program obeys the synchronization model Data-Race-Free-0 (DRF0), if and only if</p>
+<ol>
+<li>all synchronization operations are recognizable by the hardware and each accesses exactly one memory location, and</li>
+<li>for any execution &hellip;, all <strong>conflicting</strong> accesses are ordered by the <strong>happens-before</strong> relation corresponding to the execution.</li>
+</ol>
+</blockquote>
+<p>Informally, the <strong>happens-before</strong> relation is the combination of program order (sequential op order on each thread) and synchronization order (order of synchronizing ops on the same memory location). A <strong>data race</strong>, as implied from the above definition, is constituted by two or more accesses to the same memory location that are (1) not ordered by happens-before, and (2) not all reads (i.e. conflicting).</p>
+<p>In other words, in SC-DRF0, the hardware promises to appear sequentially consistent to the software if the software does not introduce data races. This simple model gives hardware vendors space to optimize performance, while allowing software programmers to keep reasoning about sequential execution without knowing the intricate details o
+implementation. SC-DRF0 was initially conceived as a contract between hardware and assembly instructions, but later became the basis for the memory models of all multi-threaded programming languages, including C, C++, Java, JavaScript, Rust, and Swift<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>.</p>
+<h2 id="c11-and-sc-drf0">C++11 and SC-DRF0</h2>
+<p>So far, we&rsquo;ve described the first half of the atomics and memory model proposal for C++11, which is summarized as the following in the C++11 standard<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>:</p>
+<blockquote>
+<p>&hellip; a C++ program can have more than one thread of execution (a.k.a. thread) running concurrently &hellip; The execution of the entire program consists of an execution of all of its threads. [Note: Usually the execution can be viewed as an interleaving of all its threads. However some kinds of atomic operations, for example, allow executions inconsistent with a simple interleaving, as described below. —end note ]</p>
+<p>The execution of a program contains a data race if it contains two conflicting actions in different threads, at least one of which is not atomic, and neither happens before the other. Any such data race results in undefined behavior. [ Note: It can be shown that programs that correctly use mutexes and <code>memory_order_seq_cst</code> operations to prevent all data races and use no other synchronization operations behave as if the operations executed by their constituent threads were simply interleaved, with each value computation of an object being taken from the last side effect on that object in that interleaving. This is normally referred to as &ldquo;sequential consistency&rdquo;. However, this applies only to data-race-free programs, and data-race-free programs cannot observe most program transformations that do not change single-threaded program semantics. In fact, most single-threaded program transformations continue to be allowed, since any program that behaves differently as a result must perform an undefined operation. — end note ]&rdquo;</p>
+</blockquote>
+<p>As hinted here, C++11 chose to define an atomics library as the vehicle for &ldquo;synchornization operations&rdquo; in SC-DRF0. The atomics library integrates ordering constraints along with its operations instead of using explicit memory barriers, the reasoning of which is explained in <sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>. It provides memory ordering options weaker than sequential consistency, such as acquire/release ordering, but the default behavior is SC. If we restrict the use of atomics library to only the default ordering constraint, the behavior is exactly SC-DRF0.</p>
+<p>Another peculiarity of the C++ standard is the undefined behavior, or &ldquo;catch fire&rdquo; semantics of programs with data races. UB is fairly common, if controversial, in the C++ standard. The reasoning is again given in <sup id="fnref1:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>.</p>
+<p>Things would be simpler if we stopped here and enforced that both hardware and programming languages must maintain the illusion of SC-DRF0 with no caveats. Unfortunately, SC-DRF0 means that no memory operations can be re-ordered before or past synchronizing operations, and this is still too expensive on some architectures (although some argue to the contrary<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>). What we really want is to restrict the ordering of <em>just enough</em> operations in <em>just the right directions</em>.</p>
+<h2 id="the-hardware">The Hardware</h2>
+<p>It is necessary to look into details about hardware to appreciate the cost of SC-DRF0. x86 architectures implement &ldquo;Total Store Order&rdquo;, or TSO<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>, so called because all processors agree on a total order in which writes commit to shared memory. This model can be understood as a simple multi-thread shared memory system with per-thread store buffers. Reads consult the store buffer first, and then access shared memory. Writes are simply queued in the local store buffer. If we consider the four possible pairs of memory operations, i.e. (load; load), (load; store), (store; store), (store; load), only the (store; load) pair can be re-ordered in the TSO model. All other pairs are guaranteed to preserve ordering. This is reflected in Intel&rsquo;s Software Developer Manual<sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup>:</p>
+<blockquote>
+<ul>
+<li>
+<p>Reads are not reordered with other reads.</p>
+</li>
+<li>
+<p>Writes are not reordered with older reads.</p>
+</li>
+<li>
+<p>Writes to memory are not reordered with other writes &hellip; (with exceptions)</p>
+</li>
+<li>
+<p>Reads may be reordered with older writes to different locations but not with older writes to the same location.</p>
+</li>
+</ul>
+</blockquote>
+<p>Unlike x86, POWER and ARM architectures are examples of much weaker memory models. Their models can be roughly understood as each thread having its own copy of memory, such that writes from each thread may propagate to other threads in any order. All four pairs of memory operations can be re-ordered in POWER and ARM<sup id="fnref1:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup> <sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>.</p>
+<p>In all architectures, special instructions can be used to preserve memory ordering. This typically comes in the form of <em>memory barrier</em> instructions, which can be inserted between two regular instructions so they cannot be re-ordered across the memory barrier. Sometimes, there are also special instructions like load-exclusive/store-exclusive on ARM that directly implement acquire/release semantics. Notably, enforcing ordering between a (store; load) pair is typically the most expensive constraint among the four pairs of memory operation. On some architectures, a heavy-weight <em>full memory barrier</em> must be used between the two operations - a <code>sync</code> instruction on POWER, as opposed to the cheaper <code>lwsync</code>. This is the cost incurred by SC-DRF0 (i.e. <code>memory_order_seq_cst</code>) without a weaker memory model. In addition, most higher-level synchronization primitives do not need such a strong barrier to achieve SC semantics (with the exception of Dekker&rsquo;s algorithm or IRIW access patterns<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>). As such, weaker memory ordering options were introduced into C++11<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>.</p>
+<h2 id="c11-and-weak-ordering">C++11 and Weak Ordering</h2>
+<p>As mentioned, acquire/release ordering is a weaker constraint than sequential consistency. Unlike SC, they only place &ldquo;unidirectional&rdquo; constraints on surrounding operations:</p>
+<ul>
+<li>A read-acquire executes before all reads and writes by the same thread that follow it in program order.</li>
+<li>A write-release executes after all reads and writes by the same thread that precede it in program order.</li>
+</ul>
+<p>More intuitively, a load-acquire can be thought of as a lock acquisition, and a store-release can be thought of as a lock release. Operations in the critical section in between cannot move out, but operations outside the critical section can move in. I believe this is also how the ordering got its name<sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup>.</p>
+<p>Acquire/release is often all the ordering you need to implement widely applicable synchronization primitives - classic examples include message-passing<sup id="fnref1:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup> and double-checked locking<sup id="fnref:14"><a href="#fn:14" class="footnote-ref" role="doc-noteref">14</a></sup>. Neither acquire nor release require the use of full memory barriers, so it&rsquo;s often cheaper and equally portable when this works, although producing a correct implementation is significantly more difficult. Additionally, since the standardization of acquire/release semantics, their cost are becoming increasingly lower on hardware - ARMv8 supports them as native instructions.</p>
+<p>Things would be simpler if we stopped here and enforced that both hardware and programming languages must support acquire/release ordering at a minimum, and no weaker model can be exposed. Unfortunately, sometimes we&rsquo;d like to not enforce ordering at all, but simply say &ldquo;this variable should be accessed atomically&rdquo;. Because C++11 forbids unannotated data races, this unordered-but-atomic use case led to <code>memory_order_relaxed</code>.</p>
+<p><code>memory_order_relaxed</code> imposes almost no ordering constraints, except for atomic operations on the same memory location, to rule out some extremely unintuitive behavior<sup id="fnref:15"><a href="#fn:15" class="footnote-ref" role="doc-noteref">15</a></sup>. This is covered by a clause about modification order in the C++11 standard<sup id="fnref1:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>.</p>
+<blockquote>
+<p>All modifications to a particular atomic object M occur in some particular total order, called the <em>modification order</em> of M. If A and B are modifications of an atomic object M, and A happens before B, then A shall precede B in the modification order of M &hellip;</p>
+</blockquote>
+<p>Relaxed ordering is even more difficult to use correctly than acquire/release ordering, and the exact semantics of relaxed ordering in (arguably) corner cases is still under-specified<sup id="fnref:16"><a href="#fn:16" class="footnote-ref" role="doc-noteref">16</a></sup>, but there are some well-known use cases, including sequence locks, simple counters whose value does not affect control flow, reference counts (such as the one found in <code>std::shared_ptr</code>), etc<sup id="fnref1:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup> <sup id="fnref:17"><a href="#fn:17" class="footnote-ref" role="doc-noteref">17</a></sup>.</p>
+<h2 id="c20">C++20</h2>
+<p>C++20 introduced some (arguably) minor revisions to the existing memory model standard. See <a href="https://stackoverflow.com/questions/70554277/what-is-the-significance-of-strongly-happens-before-compared-to-simply-happ">this post</a> or <sup id="fnref:18"><a href="#fn:18" class="footnote-ref" role="doc-noteref">18</a></sup>.</p>
+<h2 id="epiloguerant">Epilogue/Rant</h2>
+<p>It&rsquo;s daunting to realize that a handful of sentences in the C++ standard can hide this amount of complexity and decades of research. While I didn&rsquo;t expect C++ atomics to be a simple matter, memory models are something else.</p>
+<p>Some variation of <a href="https://en.wikipedia.org/wiki/Conway%27s_law">Conway&rsquo;s Law</a> also seems to be at work here to exacerbate the situation. Three groups are involved in this problem - application programmers, language designers, hardware designers - and many more organizations behind them. The memory model has to reconcile concerns across all these groups while remaining (mostly) backwards compatible. A concrete example is that despite the strong memory model of x86, C++ has to accommodate the hardware with the weakest memory model. Surely, if we designed the hardware and the language together, this is not the solution we&rsquo;d end up with?</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>L. Lamport, &ldquo;<a href="http://lamport.azurewebsites.net/pubs/multi.pdf">How to Make a Multiprocessor Computer That Correctly Executes Multiprocess Programs</a>,&rdquo; Sep. 1979.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>S. V. Adve and K. Gharachorloo, <a href="https://www.hpl.hp.com/techreports/Compaq-DEC/WRL-95-7.pdf">Shared Memory Consistency Models: A Tutorial</a>.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>S. V. Adve and M. D. Hill, &ldquo;<a href="https://dl.acm.org/doi/10.1145/325096.325100">Weak Ordering - A New Deﬁnition</a>.&rdquo;&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>R. Cox, &ldquo;<a href="https://research.swtch.com/plmm">Programming Language Memory Models</a>.&rdquo;&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>H. Boehm, &ldquo;<a href="https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2007/n2429.htm">N2429: Concurrency memory model (final revision)</a>.&rdquo;&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>H. Boehm, &ldquo;<a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2176.html">N2176: Memory Model Rationales</a>.&rdquo;&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>D. Marino, T. Millstein, M. Musuvathi, and A. Singh, &ldquo;<a href="http://web.cs.ucla.edu/~todd/research/snapl15.pdf">The Silently Shifting Semicolon</a>,&rdquo;.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8">
+<p>L. Maranget, S. Sarkar, and P. Sewell, &ldquo;<a href="https://www.cl.cam.ac.uk/~pes20/ppc-supplemental/test7.pdf">A Tutorial Introduction to the ARM and POWER Relaxed Memory Models</a>.&rdquo;&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:9">
+<p><a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">Intel 64 and IA-32 Architectures Software Developer Manual</a>, Volume 3, § 8.2.2.&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:10">
+<p>P. E. McKenney, <a href="https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook-1c.2021.12.22a.pdf">Is Parallel Programming Hard, And, If So, What Can You Do About It?</a>, § 15.5.&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:11">
+<p>H. Boehm and S. V. Adve, <a href="https://www.hpl.hp.com/techreports/2008/HPL-2008-56.pdf">Foundations of the C++ Concurrency Memory Model</a>.&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:12">
+<p>H. Sutter, &ldquo;<a href="https://www.youtube.com/watch?v=KeLBd2EJLOU">C++ and Beyond 2012: Herb Sutter - atomic Weapons 2 of 2</a>.&rdquo;&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:13">
+<p>J. Preshing, &ldquo;<a href="https://preshing.com/20120913/acquire-and-release-semantics/">Acquire and Release Semantics</a>.&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:14">
+<p>J. Preshing, <a href="https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/#using-c11-sequentially-consistent-atomics">Double-Checked Locking is Fixed In C++11</a>.&#160;<a href="#fnref:14" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:15">
+<p>H. Boehm, <a href="https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2007/n2480.html">N2480: A Less Formal Explanation of the Proposed C++ Concurrency Memory Model</a>.&#160;<a href="#fnref:15" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:16">
+<p>H. Boehm, <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1217r0.html">P1217R0: Out-of-thin-air, revisited, again</a>.&#160;<a href="#fnref:16" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:17">
+<p>H. Boehm and P. E. McKenney, <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2055r0.pdf">P2055R0: A Relaxed Guide to memory_order_relaxed</a>.&#160;<a href="#fnref:17" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:18">
+<p>H. Boehm et al, <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0668r5.html">P0668R5: Revising the C++ memory model</a>.&#160;<a href="#fnref:18" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</main>
+
+  <footer>
+  
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4B68JJFZ6W', { 'anonymize_ip': false });
+}
+</script>
+
+
+  
+  <hr/>
+  © 2024 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

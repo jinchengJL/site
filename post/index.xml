@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Jincheng Li</title>
+    <link>http://jincheng.li/post/</link>
+    <description>Recent content in Posts on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Feb 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tech Interviews in China, circa 2022</title>
+      <link>http://jincheng.li/post/interviewing-in-china/</link>
+      <pubDate>Sun, 26 Feb 2023 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/interviewing-in-china/</guid>
+      <description>I recently moved to China with my family and went through the process of looking for a new job in an unfamiliar and highly competitive market. I invested a significant amount of effort and time into the interviews, which made for an interesting experience. In this post, I&amp;rsquo;ll write about how I prepared for the interviews, the experience itself, and some thoughts around the process.&#xA;Quirks of Tech Interviews in China Interview Format and Content Tech interviews in China have a lot in common with their US counterparts, but also many quirks.</description>
+    </item>
+    <item>
+      <title>Zotero</title>
+      <link>http://jincheng.li/post/zotero/</link>
+      <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/zotero/</guid>
+      <description>Zotero is an incredible piece of software. It is ostensibly a citation manager for academic researchers, but goes far beyond that. I don&amp;rsquo;t think it gets enough attention outside of academic circles, so here is an entire blog post appreciating how good it is.&#xA;I discovered Zotero early last year from a random blog on the Internet. For a while I had been searching for a tool to organize my digital reading habits - consisting mostly of blog posts and academic papers - but it had never occurred to me to look for citation managers.</description>
+    </item>
+    <item>
+      <title>Consistency in Shared Memory Systems and Distributed Databases</title>
+      <link>http://jincheng.li/post/consistency-comparison/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/consistency-comparison/</guid>
+      <description>It&amp;rsquo;s well known that many distributed consistency models come from the literature on shared memory multiprocessor systems. Intuitively, both systems need to present a consistent view of asynchronously replicated data to external clients (where replication in shared memory comes from caches), and therefore share the same underpinning theory. However, subtle differences between the two lead to their adoption of distinct consistency models. This is my attempt to explain the popular solutions for each system, and some observations on where the two diverge.</description>
+    </item>
+    <item>
+      <title>The C&#43;&#43; Memory Model, or Why We Can&#39;t Have Nice Things</title>
+      <link>http://jincheng.li/post/cpp-mm/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/cpp-mm/</guid>
+      <description>This post gives a brief overview of the memory model problem, its history, and the approach taken by C++. Memory models are a notoriously difficult subject justifying book-length introductions, so many details are left out - I consider this post a refresher on the topic with links to relevant literature. Please see referenced materials in footnotes for a more serious introduction.&#xA;The Problem Here&amp;rsquo;s an over-simplified mental model of how a C++ program is executed on a computer:</description>
+    </item>
+    <item>
+      <title>Warnings on Memory Models and Atomics</title>
+      <link>http://jincheng.li/post/mm-warnings/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/mm-warnings/</guid>
+      <description>Against better judgement, I&amp;rsquo;ve gone down the rabbit hole of learning about memory models of various languages and systems. Before proceeding to the main content, it&amp;rsquo;s customary among such articles to notify the reader that coming anywhere close to memory models can be too much fun ill-advised. Below are some examples I&amp;rsquo;ve collected. Please be warned :)&#xA;Herb Sutter, atomic Weapons: The C++ Memory Model and Modern Hardware:&#xA;It’s a session that includes topics I’ve publicly said for years is Stuff You Shouldn’t Need To Know and I Just Won’t Teach, but it’s becoming achingly clear that people do need to know about it.</description>
+    </item>
+    <item>
+      <title>Practical Hash Tables</title>
+      <link>http://jincheng.li/post/practical-hash-tables/</link>
+      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/practical-hash-tables/</guid>
+      <description>This is a quick review of hash tables and some musings about their performance. The article was written in 2021, around the first time I needed to really pay attention to the performance and detailed design of hash tables. It comes off as fairly rudimentary to me now, and probably to you too if you know anything about performance optimization or CPU architecture. Please be warned.&#xA;Hash tables: from the outside Most languages come with standard library implementations of hash tables, usually presented as an associative array of (key, value) pairs.</description>
+    </item>
+    <item>
+      <title>Computer Architecture 101</title>
+      <link>http://jincheng.li/post/basic-comp-arch/</link>
+      <pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+      <guid>http://jincheng.li/post/basic-comp-arch/</guid>
+      <description>A review of basic computer architecture follows, partially inspired by linux-insides. I originally wrote this in 2016, but made edits later.&#xA;Von Neumann Machines Computers today are loosely based on the von Neumann architecture as shown above, with three major components &amp;ndash; CPU, I/O devices, and memory &amp;ndash; connected over buses (wires). The computer works as the CPU executes instructions that either read/write to memory, or interact with I/O devices.</description>
+    </item>
+    <item>
+      <title>Enforcing Email Frequency Caps</title>
+      <link>http://jincheng.li/post/email-frequency-cap/</link>
+      <pubDate>Thu, 29 Mar 2018 16:15:24 -0400</pubDate>
+      <guid>http://jincheng.li/post/email-frequency-cap/</guid>
+      <description>Enough with the Spamming: Enforcing Email Frequency Caps This is something I did at work around 2017. It talks about challenges involved in preventing our services from sending too many emails to the same address quickly.</description>
+    </item>
+    <item>
+      <title>PostgreSQL Query Optimization</title>
+      <link>http://jincheng.li/post/postgres-query-opt/</link>
+      <pubDate>Fri, 08 Apr 2016 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/postgres-query-opt/</guid>
+      <description>This post gives a high-level explanation of Postgres query optimization. It assumes basic familiarity with relational databases and SQL queries.&#xA;Background PostgreSQL, or Postgres, is an open-source object-relational database management system. It has gone through around 30 years of development, has a ton of features, and is very popular within the database community. This post will focus on its query optimization routines, particularly how it optimizes join queries.&#xA;Query Optimization 101 Query optimization is the process of determining the best evaluation plan for a query, based on a limited amount of information about a database (e.</description>
+    </item>
+  </channel>
+</rss>

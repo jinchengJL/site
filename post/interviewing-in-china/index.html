@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tech Interviews in China, circa 2022 | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Tech Interviews in China, circa 2022</span></h1>
+
+<h2 class="date">2023/02/26</h2>
+</div>
+
+<main>
+<p>I recently moved to China with my family and went through the process of looking for a new job in an unfamiliar and highly competitive market. I invested a significant amount of effort and time into the interviews, which made for an interesting experience. In this post, I&rsquo;ll write about how I prepared for the interviews, the experience itself, and some thoughts around the process.</p>
+<h2 id="quirks-of-tech-interviews-in-china">Quirks of Tech Interviews in China</h2>
+<h3 id="interview-format-and-content">Interview Format and Content</h3>
+<p>Tech interviews in China have a lot in common with their US counterparts, but also many quirks. One example is what I&rsquo;d call &ldquo;acquired knowledge&rdquo; questions, or pop quizzes. Topics range from programming language mechanics, to computer science fundamentals, to details of widely used production systems. For example, according to online forums, questions around Java&rsquo;s implementation of hash maps, TCP 3-way handshake, Redis data structures, MySQL locking rules are fairly popular.</p>
+<p>Another difference is that interviewers probe into past project experiences at length. Interviews usually start with a self introduction, and then we&rsquo;d start talking about past projects. Although this also happens in US interviews, they are not done to nearly the same extent. Sometimes an entire interview would be spent talking about project experiences and going into technical details about them. I imagine this is useful to assess the technical depth of candidates and filter out candidates that exaggerate their involvement in projects on their resume. On the flip side, a lot of professional experiences can be confidential, so candidates may not be able to freely talk about their most impressive accomplishments.</p>
+<p>After the technical sessions, there is usually an HR round. This consists of a senior HR employee asking the candidate behavioral questions, inquiring about the candidate&rsquo;s expectations for the position, answering the candidate&rsquo;s questions about the company, etc. I&rsquo;d say this is more about finding red flags around culture fit than anything else. Compensation negotiation happens later. Culture fit rounds happen in the US too, but in my experience they are usually conducted by engineers.</p>
+<p>There is an optional final round with a VP-level manager. This round tends to only happen for experienced hires. At this point in the process, the candidate is very likely to receive an offer, so I&rsquo;d surmise this round is more about culture fit, up-leveling, selling the position to the candidate, etc. Frankly I didn&rsquo;t always know what the interviewers were looking for in these interviews.</p>
+<h3 id="interview-process">Interview Process</h3>
+<p>There are also many &ldquo;administrative&rdquo; differences during the interview process. Note I relied on head hunters a lot, so this may not be representative of all job seekers.</p>
+<p>Both job seekers and employers use popular job-hunting apps a lot - I personally relied on <a href="https://maimai.cn">脉脉</a>. Unlike the US, there isn&rsquo;t a <a href="https://www.linkedin.com/">monopoly</a> of such apps. Every app has its own niche. Some have the most comprehensive positions. Some specialize in foreign companies. Some have the best social features. Etc.</p>
+<p>When it comes to learning more about positions and arranging for interviews, there is frequently a headhunter serving as the intermediary between me and the company&rsquo;s HR contact. Communication was primarily handled via WeChat and phone calls, including interview scheduling. Emails are only sent as a formal invitation after verbal confirmation via other channels. I appreciated the extra person in the loop to keep me updated on the job market and help me negotiate offers. On the flip side, occasionally the extra person can be a hurdle to communication if they are not on top of everything. The amount of headhunters offering the same position to you can also be an annoyance.</p>
+<p>Interviews are scheduled one at a time, unlike in the US where you are typically brought on site for 3-4 consecutive interviews after 1-2 initial phone screens. This prolongs the interview process quite a lot. To make matters worse, there was a pandemic outbreak in China when I interviewed, and I was also based in the US so interviews had to be conducted at early morning or night time. The overall process took more than two months at some of the companies I interviewed for.</p>
+<p>There tends to be a lot of rigidity in choosing candidates with the exact right set of job-related skills. Candidates would be categorized into &ldquo;C++ developers&rdquo;, &ldquo;Java developers&rdquo;, &ldquo;database developers&rdquo;, etc and then matched to available positions through resume screening. The categories are not mutually exclusive, but the implication is that without experience using the exact technology stack an employer uses, you resume is unlikely to get picked. Furthermore, even some of the technical interviewers also preferred candidates with relevant experience in very specific technologies. This may be an indication that the market favors employers siginificantly, because candidates fitting any specific profile can be found cost-effectively.</p>
+<p>Lastly, a lot of companies expect employees to work extra hours. Some companies would write requirements like &ldquo;must thrive under stress and persevere through difficulties&rdquo; in their job description, which is basically code for <a href="https://en.wikipedia.org/wiki/996_working_hour_system">996</a>. I found this to be a little funny (and sad), and also a direct reflection of the cultural differences between the job markets. My impression is that US tech employers are generally allergic to &ldquo;stress&rdquo; and would prefer to keep you far away from it.</p>
+<h2 id="preparation">Preparation</h2>
+<p>I had around 1.5 months of semi-free time to prepare for the interviews. I divided the preparation into 3 broad categories: LeetCode-style coding, acquired knowledge, system design.</p>
+<h3 id="coding-questions">Coding Questions</h3>
+<p>For coding rounds, I completed 2-3 LeetCode questions a day for a month, mostly following one of the &ldquo;LeetCode 75&rdquo; lists which are nicely organized by topic. I also tried out some LeetCode virtual contests, where you are asked to complete 4 questions in 1.5 hours. The time limit was difficult to beat, and apparently there was rampant cheating, and by December it seemed <a href="https://news.ycombinator.com/item?id=33850999">ChatGPT would undermine the competitive aspect of it</a>. So, I&rsquo;d only recommend doing the virtual contests at your own pace.</p>
+<p>For better or worse, I found that practicing LeetCode is still the single most useful thing one can do to improve their chances at an offer. Below are some useful things I&rsquo;d forgotten about and re-learned during this exercise:</p>
+<ul>
+<li>Union-find algorithm</li>
+<li>C++ STL&rsquo;s heap and priority queue utilities</li>
+<li>Bi-directional BFS</li>
+<li>Minimum spanning tree algorithms: Prim, Kruskal</li>
+<li>Floyd’s cycle finding algorithm</li>
+<li>Strongly connected components (Kosaraju&rsquo;s Algorithm)</li>
+</ul>
+<p>If you find LeetCode boring, trying the problems in a new programming language can be more fun. I did some of them in Rust to keep things interesting.</p>
+<h3 id="acquired-knowledge">Acquired Knowledge</h3>
+<p>While the idea of acquired knowledge questions in interviews was initially off-putting, the experience of preparing for them was frankly quite enjoyable. I got to learn about some popular systems that I never had a chance to work with professionally. The way I did this was to compile a list of topics to review, and to treat each as a literature review exercise.</p>
+<p>While reviewing, I discovered there had been rapid development in intermediate-level online learning materials for developers in the Chinese market, driven by commercial learning platforms like <a href="https://geektime.com">极客时间</a> and <a href="https://juejin.cn">掘金</a>. These platforms offer high-quality, in-depth courses on technical topics like programming languages and specific commercial systems. There is an emphasis on practice over theory, which I haven&rsquo;t found to be true in similar platforms in the US. For example, a typical online course in the US on databases teach a lot of general database theory but does not focus on any particular system, while an equivalent online course in China talks about implementation details of MySQL, which I imagine will be more valuable on the job. Of course, both approaches have their pros and cons, but I&rsquo;ve found intermediate-level learning materials for specific systems lacking on the English-speaking Internet.</p>
+<p>I&rsquo;ll enumerate the topics I reviewed below. Note my interests are mostly in networking and databases, so there is a bias toward these topics.</p>
+<ul>
+<li>
+<p>Redis and caching</p>
+<p>The simplicity and popularity of Redis makes it an appealing subject for interviews. I had only briefly worked with it, so I spent a good amount of time getting up to speed. I followed an online course offered at <a href="https://juejin.cn">掘金</a>, found out and learned about <a href="https://dragonflydb.io">DragonflyDB</a> and <a href="https://seastar.io">SeaStar</a>, and read some papers around caching, e.g. Twitter&rsquo;s Pelikan/SegCache.</p>
+</li>
+<li>
+<p>MySQL</p>
+<p>There is an interesting dynamic between MySQL and PostgreSQL. Their relative popularity differs by geographical region according to Google trends. The former is more popular in China, while the latter is more popular in Russia and the US. As a result I&rsquo;m less familiar with MySQL than Postgres. To learn about MySQL, I read through an excellent online course offered by <a href="https://geektime.com">极客时间</a>. I then attempted to peruse the InnoDB code base but found the naming conventions obscure and realized it would take me an unreasonable amount of time to grasp it. I&rsquo;d still be interested in a good walkthrough of InnoDB&rsquo;s implementation if anyone knows about one. In contrast, resources on PostgreSQL seems more readily available. Additionally, I read the <a href="https://dl.acm.org/doi/10.1145/3035918.3056101">Amazon</a> <a href="https://dl.acm.org/doi/10.1145/3183713.3196937">Aurora</a> papers which were very well-written.</p>
+</li>
+<li>
+<p>Columnar/OLAP Databases</p>
+<p>I happened to interview on a team working on OLAP databases, so I read some literature from Google to brush up: <a href="https://research.google/pubs/pub47224/">F1 Query</a>, <a href="http://www.vldb.org/pvldb/vol13/p3461-melnik.pdf">Dremel paper from 2020</a>, <a href="https://cloud.google.com/blog/products/bigquery/inside-capacitor-bigquerys-next-generation-columnar-storage-format">blog</a> <a href="https://cloud.google.com/blog/products/bigquery/in-memory-query-execution-in-google-bigquery">posts</a> about BigQuery.</p>
+</li>
+<li>
+<p>Kafka</p>
+<p>Message queues have become ubiquitous in recent years, but I haven&rsquo;t used them at work for a while. To brush up, I read the 2017 version of <a href="https://www.amazon.com/Kafka-Definitive-Real-Time-Stream-Processing/dp/1491936169">Kafka: The Definitive Guide</a>. It&rsquo;s a bit outdated - I&rsquo;d recommend the newer version.</p>
+</li>
+<li>
+<p>Network Protocols: HTTP, TCP</p>
+<p><a href="https://xiaolincoding.com/network/">小林coding</a> has a great illustrated series about computer networks which I highly recommend (for Chinese speakers). I also skimmed through some RFCs: <a href="https://www.rfc-editor.org/rfc/rfc9293">RFC 9293</a> for TCP, and RFCs 9110 - 9115 for HTTP. It just so happened that these major RFCs were published recently on TCP and HTTP organizing and summarizing past RFC documents, which are great starting points for reviewing. I also acquired a newfound appreciation for how complex TCP is. Also, Marek Majkowski publishes a lot of <a href="https://blog.cloudflare.com/author/marek-majkowski/">quality posts on TCP/IP</a> on Cloudflare&rsquo;s blog. Finally, along with the RFCs, I found the parts of <a href="https://hpbn.co">High Performance Browser Networking</a> covering network protocols to be informative.</p>
+</li>
+<li>
+<p>Relational Databases</p>
+<p>CMU&rsquo;s latest iteration of <a href="https://www.youtube.com/playlist?list=PLSE8ODhjZXjaKScG3l0nuOiDTTqpfnWFf">Intro to Databases</a> course is being slowly uploaded to YouTube. I watched about half the episodes, and re-watched another half episodes from the prior <a href="https://www.youtube.com/playlist?list=PLSE8ODhjZXjasmrEd2_Yi1deeE360zv5O">Advanced DBMS</a> offering from CMU. Andy does demos of MySQL vs PostgreSQL which is fun. I also brushed up on MVCC techniques.</p>
+</li>
+<li>
+<p>Operating Systems / Linux</p>
+<p>Linux async I/O APIs tend to come up in interviews, but I don&rsquo;t use them much at work, so I read some scattered blog posts about select, <a href="https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/">epoll</a>, <a href="https://kernel.dk/io_uring.pdf">io_uring</a>. In particular <code>io_uring</code> seems to be an exciting recent development.</p>
+</li>
+<li>
+<p>C++</p>
+<p>I use C++ extensively at work so I didn&rsquo;t spend too much time on it, although anything related to C++ tends to send me down a rabbit hole. I read about <a href="www.scs.stanford.edu/~dm/blog/decltype.htmll">value categories</a> (and the linked blog has a few more gems), learned about and skimmed through an <a href="http://stepanovpapers.com/butler.hpl.hp/stl/stl/">original implementation of STL containers</a>. I also read some <a href="https://zhuanlan.zhihu.com/p/359339802">sample interview questions</a> (in Chinese). These question lists generally provide a good sample of the sort of questions asked, but the answers vary greatly in quality and are not to be blindly trusted. For example, there seems to be a widespread misunderstanding of what <code>inline</code> does - it <a href="https://en.cppreference.com/w/cpp/language/inline">doesn&rsquo;t make your functions inline</a>.</p>
+</li>
+</ul>
+<p>I also made (digital) flash cards with known interview questions with the help of <a href="https://neuracache.com">NeuraCache</a>. Ultimately they didn&rsquo;t prove too useful, but I didn&rsquo;t mind the spaced repetition exercise. Relatedly, I highly recommend memorizing <a href="https://colin-scott.github.io/personal_website/research/interactive_latency.html">&ldquo;latency numbers every programmer should know&rdquo;</a> with this type of exercise, which has been useful for me in day-to-day work.</p>
+<h3 id="system-design">System Design</h3>
+<p>To prepare for system design rounds, I read the <a href="https://www.amazon.com/System-Design-Interview-insiders-Second/dp/B08CMF2CQF">System Design Interview</a> book, watched some <a href="https://www.youtube.com/playlist?list=PLjTveVh7FakKjb4UYzUazqBNNF-WGurXp">YouTube system design videos</a>, reviewed <a href="https://dataintensive.net">Designing Data-Intensive Applications</a>, and read some whitepapers from <a href="https://aws.amazon.com/builders-library/">Amazon Builders&rsquo; library</a>.</p>
+<p>This is a popular interview format for experienced engineers in the US, but it seems less popular in China, so I didn&rsquo;t end up spending too much time here. That said, I&rsquo;d happily vote for this format over talking about past project experiences or acquired knowledge questions. If there were more time, I&rsquo;d probably read the Google SRE book and the second volume of Alex Xu&rsquo;s System Design Interview book, too.</p>
+<h2 id="interviewing">Interviewing</h2>
+<p>The actual interview experience only matched some of my expectations during the preparation phase. Here is how that went.</p>
+<h3 id="coding-questions-1">Coding Questions</h3>
+<p>This part of the preparation paid off the most. I had to complete a coding question in virtually every interview session. Even for interviews with lots of project experience / acquired knowledge questions, the interviewer would still ask a coding question. They&rsquo;d either prolong the interview so you can finish coding or simply expect you to finish it in less time. There was one employer that only asked me to describe an algorithm for the question given, instead of writing down the code.</p>
+<p>Employers asked questions of widely varying difficulty. This is mostly a function of what type of candidates companies like to hire. I&rsquo;d estimate the majority asked LeetCode mediums - including the equivalent of FAANGs in China. There were some cases where I was almost sure the interviewer deliberately chose an easier problem and wanted me to pass. In contrast, some employers like to ask hard coding questions, and they tend to get a reputation among headhunters / recruiters. I got the impression that these companies end up with candidates with some experience in programming contests. Also, the companies that ask hard coding questions tend to put a lot of emphasis on these rounds, and less weight on projects / acquired knowledge, etc.</p>
+<p>In the distant past, I also participated in programming contests, so I&rsquo;m not opposed to this style of interviews. I will say that I&rsquo;ve never found the competitive aspect of it appealing. The problem solving aspect can be fun and occasionally useful on the job.</p>
+<h3 id="acquired-knowledge-1">Acquired Knowledge</h3>
+<p>I was a little disappointed that the majority of my preparation in this category went to waste. I interviewed for infrastructure-related roles - primarily in networking and occasionally databases. Interviewers generally only asked questions in their domain: a database person would not ask you about the details of TCP, a networking person would not ask you about transactions, etc. Nobody even mentioned Redis or Kafka to me. This situation might vary as you go up the stack, as someone building the backend of a complex website may be expected to know, at some level of detail, all of the underlying building blocks.</p>
+<p>I did get asked about networking and C++ relatively frequently, because these were areas where the interviewer and I shared some experience. However, if the interviewer comes in with a preconceived set of questions, it&rsquo;s likely I won&rsquo;t be able to answer all of them. The aforementioned preparations tend to be sufficient for me to answer the first step of some question, but falls short when followed up with a deeper one. The conversation tends to develop better if they ask about what I&rsquo;ve worked on and dig into the details, but this requires that the interviewer participates in the conversation more actively.</p>
+<p>A couple companies liked to pop-quiz candidates on C++. One perhaps interesting observation is that day-to-day coding and reading things like Effective C++ does <em>not</em> prepare you for these types of questions, because they probe candidates about rarely used combinations of language features, some of which are against the best practices of modern C++.</p>
+<p>The networking questions were, OTOH, more pleasant. One interviewer asked me about the mechanisms of TCP packet retransmission and congestion control. Another asked about how to speed up an HTTP server. I talked about network load balancing a lot, which led to some high-level questions about kernel bypass, and occasionally data center network architecture.</p>
+<h3 id="system-design-1">System Design</h3>
+<p>Perhaps also unexpectedly, out of all the companies I interviewed at, only two had a system design round, and these are either US companies or domestic ones with a lot of US influence. System design questions require a lot of engagement from the interviewer to supply requirements, answer ad-hoc questions, hint at missing considerations, probe into unexpected designs, etc. I found the back-and-forth conversation makes the interview experience a lot nicer.</p>
+<h2 id="epilogue">Epilogue</h2>
+<p>The market in China is tough at the moment. Several companies had great feedback for me, but couldn&rsquo;t finalize on an offer due to hiring slowdowns mid-way through the process. The vast majority of companies required working overtime to some extent, including some US-based companies operating in China. Compensation varied greatly, ranging from roughly 35% to 75% of my US income. I ended up picking a company with a good culture and work-life balance. I won&rsquo;t disclose the specifics here, but it&rsquo;s not difficult to look up if you&rsquo;re interested.</p>
+<p>I hope my experience will be useful to others in a similar boat or are just curious about the market in China. Feel free to reach out if you&rsquo;d like to know more.</p>
+
+</main>
+
+  <footer>
+  
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4B68JJFZ6W', { 'anonymize_ip': false });
+}
+</script>
+
+
+  
+  <hr/>
+  © 2024 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

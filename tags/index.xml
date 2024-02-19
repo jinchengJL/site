@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Jincheng Li</title>
+    <link>http://jincheng.li/tags/</link>
+    <description>Recent content in Tags on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Feb 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>interviews</title>
+      <link>http://jincheng.li/tags/interviews/</link>
+      <pubDate>Sun, 26 Feb 2023 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/interviews/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>misc</title>
+      <link>http://jincheng.li/tags/misc/</link>
+      <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/misc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>consistency</title>
+      <link>http://jincheng.li/tags/consistency/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/consistency/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>databases</title>
+      <link>http://jincheng.li/tags/databases/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/databases/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>distributed systems</title>
+      <link>http://jincheng.li/tags/distributed-systems/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/distributed-systems/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>memory model</title>
+      <link>http://jincheng.li/tags/memory-model/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/memory-model/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>c&#43;&#43;</title>
+      <link>http://jincheng.li/tags/c&#43;&#43;/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>multiprocessor</title>
+      <link>http://jincheng.li/tags/multiprocessor/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/multiprocessor/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>algorithms</title>
+      <link>http://jincheng.li/tags/algorithms/</link>
+      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/algorithms/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>data structures</title>
+      <link>http://jincheng.li/tags/data-structures/</link>
+      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/data-structures/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>assembly</title>
+      <link>http://jincheng.li/tags/assembly/</link>
+      <pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+      <guid>http://jincheng.li/tags/assembly/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>computer architecture</title>
+      <link>http://jincheng.li/tags/computer-architecture/</link>
+      <pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+      <guid>http://jincheng.li/tags/computer-architecture/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>linux</title>
+      <link>http://jincheng.li/tags/linux/</link>
+      <pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+      <guid>http://jincheng.li/tags/linux/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>os</title>
+      <link>http://jincheng.li/tags/os/</link>
+      <pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+      <guid>http://jincheng.li/tags/os/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>bluecore</title>
+      <link>http://jincheng.li/tags/bluecore/</link>
+      <pubDate>Thu, 29 Mar 2018 16:15:24 -0400</pubDate>
+      <guid>http://jincheng.li/tags/bluecore/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>postgres</title>
+      <link>http://jincheng.li/tags/postgres/</link>
+      <pubDate>Fri, 08 Apr 2016 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/tags/postgres/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

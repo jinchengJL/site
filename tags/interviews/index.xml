@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>interviews on Jincheng Li</title>
+    <link>http://jincheng.li/tags/interviews/</link>
+    <description>Recent content in interviews on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Feb 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/interviews/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tech Interviews in China, circa 2022</title>
+      <link>http://jincheng.li/post/interviewing-in-china/</link>
+      <pubDate>Sun, 26 Feb 2023 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/interviewing-in-china/</guid>
+      <description>I recently moved to China with my family and went through the process of looking for a new job in an unfamiliar and highly competitive market. I invested a significant amount of effort and time into the interviews, which made for an interesting experience. In this post, I&amp;rsquo;ll write about how I prepared for the interviews, the experience itself, and some thoughts around the process.&#xA;Quirks of Tech Interviews in China Interview Format and Content Tech interviews in China have a lot in common with their US counterparts, but also many quirks.</description>
+    </item>
+  </channel>
+</rss>

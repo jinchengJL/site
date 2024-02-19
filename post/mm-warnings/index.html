@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Warnings on Memory Models and Atomics | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Warnings on Memory Models and Atomics</span></h1>
+
+<h2 class="date">2022/05/28</h2>
+</div>
+
+<main>
+<p>Against better judgement, I&rsquo;ve gone down the rabbit hole of learning about memory models of various languages and systems. Before proceeding to the main content, it&rsquo;s customary among such articles to notify the reader that coming anywhere close to memory models can be <del>too much fun</del> ill-advised. Below are some examples I&rsquo;ve collected. Please be warned :)</p>
+<p>Herb Sutter, <a href="https://herbsutter.com/2013/02/11/atomic-weapons-the-c-memory-model-and-modern-hardware/">atomic Weapons: The C++ Memory Model and Modern Hardware</a>:</p>
+<blockquote>
+<p>It’s a session that includes topics I’ve publicly said for years is Stuff You Shouldn’t Need To Know and I Just Won’t Teach, but it’s becoming achingly clear that people do need to know about it. Achingly, heartbreakingly clear, because some hardware incents you to pull out the big guns to achieve top performance, and C++ programmers just are so addicted to full performance that they’ll reach for the big red levers with the flashing warning lights. Since we can’t keep people from pulling the big red levers, we’d better document the A to Z of what the levers actually do, so that people don’t <a href="https://en.wikipedia.org/wiki/Scram">SCRAM</a> unless they really, really, really meant to.</p>
+</blockquote>
+<p>Fedor Pikus, <a href="https://www.youtube.com/watch?v=ZQFzMfHIxng">C++ atomics, from basic to advanced. What do they really do?</a>:</p>
+<blockquote>
+<p>Welcome to the Defence Against the Dark Arts class, where you will learn about the more radioactive parts of C++.</p>
+</blockquote>
+<p>Paolo Bonzini, <a href="https://lwn.net/Articles/844224/">An introduction to lockless algorithms</a>:</p>
+<blockquote>
+<p>Low-level knowledge of the memory model is universally recognized as advanced material that can scare even the most seasoned kernel hackers; our editor wrote (in the July article) that &ldquo;it takes a special kind of mind to really understand the memory model&rdquo;. It&rsquo;s been <a href="https://lwn.net/Articles/576642/">said</a> that the Linux kernel memory model &hellip; can be used to frighten small children, and the same is probably true of just the words &ldquo;acquire&rdquo; and &ldquo;release&rdquo;.</p>
+</blockquote>
+<p><a href="https://go.dev/ref/mem">The Go Memory Model</a>:</p>
+<blockquote>
+<p>If you must read the rest of this document to understand the behavior of your program, you are being too clever.</p>
+<p>Don&rsquo;t be clever.</p>
+</blockquote>
+<p><a href="https://doc.rust-lang.org/nomicon/atomics.html">The Rustonomicon, Chapter 8.3, Atomics</a>:</p>
+<blockquote>
+<p>&hellip; the memory model for atomics from C++20 &hellip; is quite complex and known to have several flaws &hellip; Trying to fully explain the model in this book is fairly hopeless. It&rsquo;s defined in terms of madness-inducing causality graphs that require a full book to properly understand in a practical way.</p>
+</blockquote>
+
+</main>
+
+  <footer>
+  
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4B68JJFZ6W', { 'anonymize_ip': false });
+}
+</script>
+
+
+  
+  <hr/>
+  © 2024 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

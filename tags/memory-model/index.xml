@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>memory model on Jincheng Li</title>
+    <link>http://jincheng.li/tags/memory-model/</link>
+    <description>Recent content in memory model on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/memory-model/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Consistency in Shared Memory Systems and Distributed Databases</title>
+      <link>http://jincheng.li/post/consistency-comparison/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/consistency-comparison/</guid>
+      <description>It&amp;rsquo;s well known that many distributed consistency models come from the literature on shared memory multiprocessor systems. Intuitively, both systems need to present a consistent view of asynchronously replicated data to external clients (where replication in shared memory comes from caches), and therefore share the same underpinning theory. However, subtle differences between the two lead to their adoption of distinct consistency models. This is my attempt to explain the popular solutions for each system, and some observations on where the two diverge.</description>
+    </item>
+    <item>
+      <title>The C&#43;&#43; Memory Model, or Why We Can&#39;t Have Nice Things</title>
+      <link>http://jincheng.li/post/cpp-mm/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/cpp-mm/</guid>
+      <description>This post gives a brief overview of the memory model problem, its history, and the approach taken by C++. Memory models are a notoriously difficult subject justifying book-length introductions, so many details are left out - I consider this post a refresher on the topic with links to relevant literature. Please see referenced materials in footnotes for a more serious introduction.&#xA;The Problem Here&amp;rsquo;s an over-simplified mental model of how a C++ program is executed on a computer:</description>
+    </item>
+    <item>
+      <title>Warnings on Memory Models and Atomics</title>
+      <link>http://jincheng.li/post/mm-warnings/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/mm-warnings/</guid>
+      <description>Against better judgement, I&amp;rsquo;ve gone down the rabbit hole of learning about memory models of various languages and systems. Before proceeding to the main content, it&amp;rsquo;s customary among such articles to notify the reader that coming anywhere close to memory models can be too much fun ill-advised. Below are some examples I&amp;rsquo;ve collected. Please be warned :)&#xA;Herb Sutter, atomic Weapons: The C++ Memory Model and Modern Hardware:&#xA;It’s a session that includes topics I’ve publicly said for years is Stuff You Shouldn’t Need To Know and I Just Won’t Teach, but it’s becoming achingly clear that people do need to know about it.</description>
+    </item>
+  </channel>
+</rss>

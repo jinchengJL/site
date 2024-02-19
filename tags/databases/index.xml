@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>databases on Jincheng Li</title>
+    <link>http://jincheng.li/tags/databases/</link>
+    <description>Recent content in databases on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/databases/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Consistency in Shared Memory Systems and Distributed Databases</title>
+      <link>http://jincheng.li/post/consistency-comparison/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/consistency-comparison/</guid>
+      <description>It&amp;rsquo;s well known that many distributed consistency models come from the literature on shared memory multiprocessor systems. Intuitively, both systems need to present a consistent view of asynchronously replicated data to external clients (where replication in shared memory comes from caches), and therefore share the same underpinning theory. However, subtle differences between the two lead to their adoption of distinct consistency models. This is my attempt to explain the popular solutions for each system, and some observations on where the two diverge.</description>
+    </item>
+    <item>
+      <title>PostgreSQL Query Optimization</title>
+      <link>http://jincheng.li/post/postgres-query-opt/</link>
+      <pubDate>Fri, 08 Apr 2016 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/postgres-query-opt/</guid>
+      <description>This post gives a high-level explanation of Postgres query optimization. It assumes basic familiarity with relational databases and SQL queries.&#xA;Background PostgreSQL, or Postgres, is an open-source object-relational database management system. It has gone through around 30 years of development, has a ton of features, and is very popular within the database community. This post will focus on its query optimization routines, particularly how it optimizes join queries.&#xA;Query Optimization 101 Query optimization is the process of determining the best evaluation plan for a query, based on a limited amount of information about a database (e.</description>
+    </item>
+  </channel>
+</rss>

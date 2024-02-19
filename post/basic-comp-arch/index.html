@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Computer Architecture 101 | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Computer Architecture 101</span></h1>
+
+<h2 class="date">2018/04/18</h2>
+</div>
+
+<main>
+<p>A review of basic computer architecture follows, partially inspired by <a href="https://0xax.gitbooks.io/linux-insides/content/">linux-insides</a>. I originally wrote this in 2016, but made edits later.</p>
+<h2 id="von-neumann-machines">Von Neumann Machines</h2>
+<p><img src="/img/von_neumann.svg" alt="von_neumann"></p>
+<p>Computers today are loosely based on the <a href="https://en.wikipedia.org/wiki/Von_Neumann_architecture">von Neumann architecture</a> as shown above, with three major components &ndash; CPU, I/O devices, and memory &ndash; connected over <a href="https://en.wikipedia.org/wiki/Bus_(computing)">buses</a> (wires). The computer works as the CPU executes instructions that either read/write to memory, or interact with I/O devices.</p>
+<p>Notably, this model applies to <em>every</em> piece of software running on a computer - they all get translated into machine instructions that the CPU carries out, which then interacts with other devices, which interacts with either more devices, or the human user. This includes every line of code in the BIOS, operating system, application, etc.</p>
+<p>The following silly example gives a glimpse into the power of this simple model. Consider what happens between a keystroke and the letter getting displayed on the screen &ndash; say, in a web browser&rsquo;s address bar.</p>
+<ol>
+<li>The circuit in the keyboard generates an interrupt to the CPU.</li>
+<li>The CPU invokes the corresponding interrupt handler implemented in the device driver.
+This handler contains hundreds, perhaps thousands, of assembly instructions. These instructions has been living on the hard disk after the OS install a long time ago, and got loaded into memory when the operating system started. Now they are being loaded into CPU cache lines and registers in order to be executed.</li>
+<li>Among other things, the instructions translate the keystroke into some keycode (which I believe is just ascii code, e.g. 0x41 for &lsquo;a&rsquo;) that represents the letter, and put the code inside a queue. The queue is a data structure contained in a utility library in the Linux kernel&rsquo;s code base.</li>
+<li>There are system calls which, through several intermediate function calls, reads from that queue. The browser application, through several layers of abstractions of its own, is invoking one of those system calls reading from standard input.</li>
+<li>Upon receiving the input, the browser uses some graphics API (e.g. OpenGL) to call some graphics driver (e.g. Direct3D) in order to render the letter, passing in the letter&rsquo;s code and the bitmap of the font to use.</li>
+<li>The graphics driver runs code on the CPU to tell the graphics card which pixels should be rendered in what color. The graphics card then renders it, and the monitor displays it.</li>
+<li>Along the way the browser also thoughtfully sent the search engine what you typed in order to give you auto-completions. This involves a slew of other CPU instructions and GPU rendering.</li>
+</ol>
+<p>It&rsquo;s rather amazing that this all works without much failure. Again, all of this is just CPU instructions plus interactions with other hardware &ndash; keyboard, main memory, graphics card, the monitor, etc. This mental model will be very useful when understanding what&rsquo;s happening in the operating system of a computer.</p>
+<h2 id="communication-between-cpu-and-other-devices">Communication between CPU and Other Devices</h2>
+<p>A slightly more nuanced view of the architecture is that the CPU communicates with two different types of components: I/O and memory. Correspondingly there are roughly two different types communication channels: the northbridge and the southbridge. These are chipsets visible on a motherboard. The northbridge is closer to the CPU and responsible for communications requiring high performance (i.e. memory, and sometimes a video card), while all other devices go through the southbridge.</p>
+<p><img src="/img/motherboard.svg" alt="motherboard"></p>
+<p>We now know the CPU talks to other components through &lsquo;bridges&rsquo;, but how exactly does the communication happen? What data is passed through and what kind of CPU instructions do we use?</p>
+<h3 id="cpu-to-hardware-memory-mapped-iohttpsenwikipediaorgwikimemory-mapped_io">CPU to Hardware: <a href="https://en.wikipedia.org/wiki/Memory-mapped_I/O">Memory-mapped I/O</a></h3>
+<p>One significant detail in the above diagram is that the only gateway the CPU has to the outside world is the <a href="https://en.wikipedia.org/wiki/Front-side_bus">front-side bus</a> (FSB). Although this diagram is a bit outdated, the point still stands that, the primary interface between the CPU and the outside world is a bunch of pins on the FSB. These pins help transmit memory addresses and the data that&rsquo;s read from / written to these addresses. So in terms of CPU instructions, the way you would use the CPU to communicate with the outside world is by issuing load and store instructions to memory locations.</p>
+<p>Well, how does writing to the memory display things on the monitor?</p>
+<p>That&rsquo;s where memory-mapped I/O comes in. In x86, MMIO is the predominant way through which CPUs issue requests to other I/O devices. This mechanism maps device registers onto physical memory addresses, so that memory addresses do not just reference RAM &ndash; they can also reference things like video cards, BIOS, and other PCI extensions. When the CPU issues a memory instruction, the northbridge is responsible for routing it to the appropriate hardware via a memory address map. This map can be inspected with <code>cat /proc/iomem</code> under Linux. Here&rsquo;s what shows up for me:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>00000000-00000fff : reserved
+</span></span><span style="display:flex;"><span>00001000-00057fff : System RAM
+</span></span><span style="display:flex;"><span>00058000-00058fff : reserved
+</span></span><span style="display:flex;"><span>00059000-0009efff : System RAM
+</span></span><span style="display:flex;"><span>0009f000-0009ffff : reserved
+</span></span><span style="display:flex;"><span>000a0000-000bffff : PCI Bus 0000:00
+</span></span><span style="display:flex;"><span>000c0000-000ce5ff : Video ROM
+</span></span><span style="display:flex;"><span>000d0000-000d3fff : PCI Bus 0000:00
+</span></span><span style="display:flex;"><span>000d4000-000d7fff : PCI Bus 0000:00
+</span></span><span style="display:flex;"><span>000d8000-000dbfff : PCI Bus 0000:00
+</span></span><span style="display:flex;"><span>000dc000-000dffff : PCI Bus 0000:00
+</span></span><span style="display:flex;"><span>000f0000-000fffff : System ROM
+</span></span><span style="display:flex;"><span>00100000-bd158fff : System RAM
+</span></span><span style="display:flex;"><span>  02000000-02772d03 : Kernel code
+</span></span><span style="display:flex;"><span>  02772d04-02d1af3f : Kernel data
+</span></span><span style="display:flex;"><span>  02e77000-02fbbfff : Kernel bss
+</span></span><span style="display:flex;"><span>bd159000-bd15ffff : ACPI Non-volatile Storage
+</span></span><span style="display:flex;"><span>bd160000-bd5b9fff : System RAM
+</span></span><span style="display:flex;"><span>bd5ba000-bda00fff : reserved
+</span></span><span style="display:flex;"><span>bda01000-dd9a5fff : System RAM
+</span></span><span style="display:flex;"><span>dd9a6000-ddbb5fff : reserved
+</span></span><span style="display:flex;"><span>ddbb6000-ddbd5fff : ACPI Tables
+</span></span><span style="display:flex;"><span>ddbd6000-de0fefff : ACPI Non-volatile Storage
+</span></span><span style="display:flex;"><span>de0ff000-def5efff : reserved
+</span></span><span style="display:flex;"><span>def5f000-deffefff : reserved
+</span></span><span style="display:flex;"><span>defff000-deffffff : System RAM
+</span></span><span style="display:flex;"><span>df000000-dfffffff : RAM buffer
+</span></span><span style="display:flex;"><span>e0000000-feafffff : PCI Bus 0000:00
+</span></span><span style="display:flex;"><span>  e0000000-f1ffffff : PCI Bus 0000:01
+</span></span><span style="display:flex;"><span>    e0000000-efffffff : 0000:01:00.0
+</span></span><span style="display:flex;"><span>    f0000000-f1ffffff : 0000:01:00.0
+</span></span><span style="display:flex;"><span>      f1000000-f12fffff : efifb
+</span></span><span style="display:flex;"><span>  f6000000-f70fffff : PCI Bus 0000:01
+</span></span><span style="display:flex;"><span>    f6000000-f6ffffff : 0000:01:00.0
+</span></span><span style="display:flex;"><span>      f6000000-f6ffffff : nvidia
+</span></span><span style="display:flex;"><span>    f7000000-f707ffff : 0000:01:00.0
+</span></span><span style="display:flex;"><span>    f7080000-f7083fff : 0000:01:00.1
+</span></span><span style="display:flex;"><span>      f7080000-f7083fff : ICH HD audio
+</span></span><span style="display:flex;"><span>  ... (lots of PCI extensions)
+</span></span><span style="display:flex;"><span>fec00000-fec00fff : reserved
+</span></span><span style="display:flex;"><span>  fec00000-fec003ff : IOAPIC 0
+</span></span><span style="display:flex;"><span>fed00000-fed03fff : reserved
+</span></span><span style="display:flex;"><span>  fed00000-fed003ff : HPET 0
+</span></span><span style="display:flex;"><span>    fed00000-fed003ff : PNP0103:00
+</span></span><span style="display:flex;"><span>... (omitted)
+</span></span></code></pre></div><p>I left out one important piece of hardware in the above paragraph &ndash; hard drives. Hard drives are a bit more complicated in that the CPU talks to them through yet another interface (e.g. ATA), and maybe <a href="https://en.wikipedia.org/wiki/Direct_memory_access">Direct Memory Access</a> (DMA) on top of ATA. DMA allows the hard disk controller to directly write to RAM, so that the CPU doesn&rsquo;t have to keep polling from it and can read disk data from RAM as well. Ultimately though, the CPU accesses the hard disk just like anything else &ndash; by reading or writing to a memory location.</p>
+<!-- raw HTML omitted -->
+<p>That covers how the CPU talks to other hardware. What about the other way around?</p>
+<h3 id="hardware-to-cpu-hardware-interruptshttpsenwikipediaorgwikiinterrupt">Hardware to CPU: Hardware <a href="https://en.wikipedia.org/wiki/Interrupt">Interrupts</a></h3>
+<p>Hardware interrupts are used by devices to notify the CPU that something happened which requires its attention. Typical examples include things like the disk controller saying the data the CPU is trying to read is ready, the keyboard saying a key was pressed, etc. There are both hardware and software interrupts, but we&rsquo;ll focus on the hardware portion since that&rsquo;s been the theme of this discussion. There are a lot more details on the Wiki page and the book <a href="https://www.amazon.com/Understanding-Linux-Kernel-Third-Daniel/dp/0596005652">Understanding the Linux Kernel</a>.</p>
+<p>Each interrupt is identified by a number between 0 and 255. Linux defines ranges within these 256 values that are dedicated to nonmaskable interrupts, maskable interrupts, and software interrupts. We don&rsquo;t need to go into too much detail here. What&rsquo;s more interesting is what exactly happens when an interrupt is issued.</p>
+<p>On the hardware side, every hardware controller that can issue interrupts has an output line dedicated to interrupts. These lines are then connected to the input pins of a Programmable Interrupt Controller (PIC), which is in turn connected to special pins of the CPU. The PIC monitors its input lines for signals, translates them into a number between 0-255, and sends them over to the CPU through its special pin. The CPU would then stop what it&rsquo;s currently doing and context switch to the appropriate interrupt handler. Here&rsquo;s an overly simplified diagram stolen from the Internet showing this:</p>
+<p><img src="/img/int_controller.jpg" alt="int_controller"></p>
+<p>To know which interrupt handler to invoke, the CPU maps interrupt codes 0-255 to handlers with the Interrupt Descriptor Table (IDT). There is a special CPU register <code>idtr</code> that stores the address of the IDT. When an interrupt occurs, the CPU would just look up whatever is stored at the address this register points to for the interrupt handler. This means the IDT can be located anywhere in memory as long as its location is loaded into <code>idtr</code> appropriately, and this is exactly what the Linux kernel does. During the booting process, <code>idtr</code> is first initialized by the BIOS to point to a small interrupt table. Later Linux takes over and puts a new address into the register so it points to a more full-fledged IDT.</p>
+<h2 id="references">References</h2>
+<ol>
+<li><a href="https://0xax.gitbooks.io/linux-insides/content/index.html">Linux Insides</a></li>
+<li><a href="https://manybutfinite.com/archives/">Gustavo Duarte&rsquo;s blog</a></li>
+<li><a href="https://www.oreilly.com/library/view/understanding-the-linux/0596005652/">Understanding the Linux Kernel</a></li>
+<li><a href="https://software.intel.com/en-us/articles/intel-sdm">Intel Software Developer Manuals</a></li>
+</ol>
+
+</main>
+
+  <footer>
+  
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4B68JJFZ6W', { 'anonymize_ip': false });
+}
+</script>
+
+
+  
+  <hr/>
+  © 2024 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consistency in Shared Memory Systems and Distributed Databases | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Consistency in Shared Memory Systems and Distributed Databases</span></h1>
+
+<h2 class="date">2022/06/14</h2>
+</div>
+
+<main>
+<p>It&rsquo;s well known that many distributed consistency models come from the literature on shared memory multiprocessor systems. Intuitively, both systems need to present a consistent view of asynchronously replicated data to external clients (where replication in shared memory comes from caches), and therefore share the same underpinning theory. However, subtle differences between the two lead to their adoption of distinct consistency models. This is my attempt to explain the popular solutions for each system, and some observations on where the two diverge.</p>
+<h2 id="general-purpose-consistency-models">&ldquo;General-Purpose&rdquo; Consistency Models</h2>
+<p>Informally, consistency models describe the guarantees a system provides on the ordering in which writes become visible to reads (of different replicas). The more uniform and intuitive this ordering is, the stronger the model.</p>
+<p>Many consistency models are universally applicable to any replicated system. <strong>Sequential consistency</strong> (SC), possibly the earliest proposed consistency model, is one such example. Recall its definition:</p>
+<blockquote>
+<p>&hellip; the result of any execution is the same as if the operations of all the processors were executed in some sequential order, and the operations of each individual processor appear in this sequence in the order specified by its program<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+</blockquote>
+<p>Lamport defined SC as a property of multiprocessor systems, but this definition can be extended to &ldquo;objects&rdquo; in a concurrent system, encompassing distributed message-passing systems as well as shared-memory architectures.  We can say an object is sequentially consistent if it permits only sequentially consistent histories, where the object can be a single memory location, a class in an OOP language, or a database row, etc.</p>
+<p>The object definition of SC additionally reveals the caveat that SC does not <em>compose</em> - a system consisting of two SC objects itself is not necessarily SC. This property makes SC objects difficult to reason about. A counter-example, based on FIFO queues, is found in Art of Multiprocessor Programming<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>:</p>
+<blockquote>
+<p>A  p.enq(x) &mdash;&mdash;&mdash;&mdash; q.enq(x) &mdash;&mdash;&mdash;&mdash; y = p.deq() &mdash;&mdash;&mdash;&mdash;</p>
+<p>B  &mdash;&mdash;&mdash;&mdash; q.enq(y) &mdash;&mdash;&mdash;&mdash; p.enq(y) &mdash;&mdash;&mdash;&mdash; x = q.deq()</p>
+<p>Two threads, A and B, call enqueue and dequeue methods on two queue objects, p and q. It is not hard to see that p and q are each sequentially consistent, yet the execution as a whole is not sequentially consistent.</p>
+</blockquote>
+<p><strong>Linearizability</strong> is a stronger, compositional consistency model. In addition to SC, linearizability imposes &ldquo;real-time&rdquo; order - any new operation must observe all prior operations that completed in real time before-hand<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>. In other words, all operations must appear to happen instantaneously at some point between call and return, and this point is dubbed the <em>linearization point</em>. In multi-threaded programming, when we say a class is thread-safe, we usually mean it is linearizable.</p>
+<p>On the weaker end of the consistency spectrum, <strong>causal consistency</strong> is a representative model. It is based on the happens-before relation<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> - the transitive closure of program order and message-passing order (or equivalently, the order of synchronizing operations in shared memory systems). Unlike the stronger models described above, causal consistency does not guarantee a total order of operations - different threads may observe different order of concurrent writes (i.e. writes unrelated by happens-before). Informally, a history is causal if there is a serial ordering of its events that respects the happens-before order.  An object is causal if it admits only causal histories<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>.</p>
+<p>What&rsquo;s also interesting about causal consistency is that it was introduced in a paper on shared memory, but to my knowledge, never caught on in shared memory systems. In contrast, it is being studied and applied extensively in distributed databases, perhaps because it is the strongest achievable consistency model that does not force processes to coordinate, affording the system lower latency and availability in network partitions. Anna<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup> is an example of the performance made possible with causal consistency.</p>
+<p>Some other examples of general-purpose consistency models, which we will not expand on, include Pipeline Random Access Memory <sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup> and session guarantees<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>. See referenced first-hand materials and the <a href="https://jepsen.io/consistency">Jepsen page</a> for a good introduction.</p>
+<h2 id="specialized-consistency-models">Specialized Consistency Models</h2>
+<p>Some consistency models only make sense in the context of particular systems. We go through a few examples below.</p>
+<h3 id="shared-memory">Shared Memory</h3>
+<p>Consistency models in shared memory systems are also known as memory (consistency) models. In an <a href="https://jincheng.li/post/cpp-mm/#the-theory">earlier post</a>, we introduced <strong>SC-DRF0</strong>, which offers a conditional consistency guarantee. It places restrictions on how a software program should be written, and guarantees sequential consistency in return. It is defined as the following:</p>
+<blockquote>
+<p>A program obeys the synchronization model Data-Race-Free-0 (DRF0), if and only if</p>
+<ol>
+<li>all synchronization operations are recognizable by the hardware and each accesses exactly one memory location, and</li>
+<li>for any execution …, all conflicting accesses are ordered by the happens-before relation corresponding to the execution<sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup>.</li>
+</ol>
+</blockquote>
+<p>Unlike general-purpose consistency models, SC-DRF0 divides memory operations into synchronization operations and &ldquo;ordinary&rdquo; operations, where the former are language-specific constructs like C++ atomics, Java volatile, etc. With this division, SC-DRF0 is able to give additional information to shared-memory hardware, enabling further optimizations, while still offering sequential consistency semantics to programmers. As mentioned in the memory model post, most high-level programming languages today adopt some variation of SC-DRF0.</p>
+<p><strong>Release consistency</strong>, like SC-DRF0, is also a conditional guarantee for sequential consistency. It makes the condition to achieve SC even more stringent - it&rsquo;s more difficult to program under this model compared to SC-DRF0:</p>
+<blockquote>
+<p>Synchronization accesses can further be partitioned into <em>acquire</em> and <em>release</em> accesses. An acquire synchronization access (e.g., a lock operation or a process spinning for a flag to be set) is performed to gain access to a set of shared locations. A release synchronization access (e.g., an unlock operation or a process setting a flag) grants this permission.</p>
+<p>(In release consistency), enough competing accesses (must) be labeled as acquire/release to ensure that the ordinary accesses are indeed non-competing (i.e. the program is data-race-free)<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>.</p>
+</blockquote>
+<p>As their names suggest, the acquire/release <a href="https://en.cppreference.com/w/cpp/atomic/memory_order">memory orders</a> in C++ are based on release consistency.</p>
+<h3 id="distributed-databases">Distributed Databases</h3>
+<p>In databases, transaction isolation levels are similar to, and <a href="http://dbmsmusings.blogspot.com/2019/08/an-explanation-of-difference-between.html">frequently confused with</a>, consistency models. The two concepts are ultimately orthogonal. Isolation is the &ldquo;I&rdquo; in ACID transactions, and refers to the guarantees a database provides for concurrent transactions to execute without exposing intermediate states to each other. In contrast, consistency is about guarantees on the order of single operations on single objects - there is no intermediate state to observe. In some contexts, &ldquo;consistency model&rdquo; is used in a broader sense to describe a mix of consistency and isolation properties of a distributed database system.</p>
+<p>The strongest isolation level is <strong>serializability</strong>, which states:</p>
+<blockquote>
+<p>A serializable execution is defined to be an execution of the operations of concurrently executing SQL-transactions that produces the same effect as some serial execution of those same SQL-transactions. A serial execution is one in which each SQL-transaction executes to completion before the next SQL-transaction begins<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup></p>
+</blockquote>
+<p>Serializability bears a lot of resemblance to sequential consistency. Both require that the execution of some operations from multiple processes are equivalent to a serial execution. There are two notable differences:</p>
+<ul>
+<li>Serializability is about multiple operations on multiple objects.</li>
+<li>Serializability does not promise anything about the order of serial execution. Unlike sequential consistency which at least preserves program order, serializability allows <a href="https://dbmsmusings.blogspot.com/2019/06/correctness-anomalies-under.html">&ldquo;time-travel&rdquo; anomalies</a> where later transactions are ordered before earlier ones in the equivalent serial order.</li>
+</ul>
+<p><strong>Strict serializability</strong> is a representative example of a guarantee that mixes consistency and isolation, addressing the &ldquo;time-travel&rdquo; caveat of serializability. Strict serializability is essentially a multi-object version of linearizability:</p>
+<blockquote>
+<p>A (partial) precedence order can be defined on non-overlapping pairs of transactions in the obvious way. A history is strictly serializable if the transactions’ order in the sequential history is compatible with their precedence order.</p>
+<p>Linearizability can be viewed as a special case of strict serializability where transactions are restricted to consist of a single operation applied to a single object<sup id="fnref1:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.</p>
+</blockquote>
+<p>Here, &ldquo;the obvious way&rdquo; refers to real-time order of transactions, just like in the definition of linearizability. If transaction Y starts after transaction X completes, strict serializability guarantees X must be before Y in the equivalent serial order of transactions. Spanner implements a version of this dubbed <a href="https://cloud.google.com/spanner/docs/true-time-external-consistency#external_consistency">external consistency</a>.</p>
+<p>Many weaker isolation levels below serializability exist, but they are less interesting from a consistency perspective. See <a href="http://dbmsmusings.blogspot.com/2019/05/introduction-to-transaction-isolation.html">this blog post</a> or &ldquo;A Critique of ANSI SQL Isolation Levels&rdquo;<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup> for a good introduction. Interestingly, the database literature associates &ldquo;anomalies&rdquo; with each isolation level to exemplify what undesirable executions are (dis)allowed by each level, which are not unlike litmus tests in the memory model literature.</p>
+<h2 id="comparison">Comparison</h2>
+<p>What leads to the adoption of different consistency models for shared memory systems and distributed databases?</p>
+<p>Let&rsquo;s consider the goals of a consistency model within the context of these systems. In an ideal world:</p>
+<ol>
+<li>A consistency model should make behaviors of the system easy to reason about by programmers.</li>
+<li>A consistency model should enable high performance (by limiting coordination among processes).</li>
+<li>In distributed databases, a consistency model should allow the database to remain available during network partitions.</li>
+<li>In distributed databases, a consistency model should enable clients to submit arbitrary new transactions during the lifetime of the database instance (cf. a statically compiled program).</li>
+</ol>
+<p>(3) and (4) highlight that for shared memory, there are fewer constraints on the consistency model - there are no concerns around network partitions, or ever-changing data access patterns.</p>
+<p>(1) is also worth expanding on. Multi-object transactions are a powerful high-level API to program around - programmers are relieved of the burden to carefully reason about intermediate states during a multi-operation multi-object transaction, crash recovery, maintaining application-specific invariants on data, etc. It is especially necessary in a multi-tenant system like distributed databases, where operations on data constantly evolve, making it infeasible to keep track of all conflicting operations and carefully coordinate their access. Transactions would also be nice to have in shared memory, but seemingly, the performance and complexity overhead they carry make them an active research area with limited industry adoption<sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup>.</p>
+<p>With differing goals, consistency models naturally diverge:</p>
+<ul>
+<li>For distributed databases, the focus is to provide a combination of consistency and multi-object transaction isolation, while allowing for trade-offs between strong consistency and low latency / availability in network partitions. This leads to the popularity of models like strict serializability (for the strongest guarantees) and causal consistency (for reasonable guarantees while avoiding expensive coordination).</li>
+<li>For shared memory systems, there are fewer requirements compared to distributed databases, but performance requirements are also more stringent. Because programmers have full control over data accesses in statically compiled programs, consistency models distinguish between synchronizing and &ldquo;ordinary&rdquo; accesses to relax the ordering constraints of memory operations, achieving better performance. Models like SC-DRF0 and release consistency have no counterparts in distributed databases.</li>
+</ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>L. Lamport, “<a href="http://lamport.azurewebsites.net/pubs/multi.pdf">How to Make a Multiprocessor Computer That Correctly Executes Multiprocess Programs</a>,” Sep. 1979.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>M. Herlihy and N. Shavit, The Art of Multiprocessor Programming, Revised Reprint, § 3.3.4, 2012.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>M. P. Herlihy and J. M. Wing, “<a href="https://doi.org/10.1145/78969.78972">Linearizability: a correctness condition for concurrent objects</a>,” Jul. 1990.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>L. Lamport, “<a href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf">Time, Clocks, and the Ordering of Events in a Distributed System</a>,”, 1978.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>M. Ahamad, G. Neiger, J. E. Burns, P. Kohli, and P. W. Hutto,  <a href="https://smartech.gatech.edu/bitstream/handle/1853/6781/GIT-CC-93-55.pdf?sequence=1&amp;isAllowed=y">Causal memory: definitions, implementation, and programming</a>, Mar. 1995.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>C. Wu, J. M. Faleiro, Y. Lin, and J. M. Hellerstein, “<a href="https://dsf.berkeley.edu/jmh/papers/anna_ieee18.pdf">Anna: A KVS For Any Scale</a>,”, Oct. 2018&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>R. Lipton and J. Sandberg, “<a href="https://www.cs.princeton.edu/techreports/1988/180.pdf">PRAM: A Scalable Shared Memory</a>.”&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8">
+<p>D. Terry, A. Demers, K. Petersen, M. Spreitzer, M. Theimer, and B. Welch, “<a href="https://www.cs.cornell.edu/courses/cs734/2000FA/cached%20papers/SessionGuaranteesPDIS_1.html">Session Guarantees for Weakly Consistent Replicated Data</a>),” Oct. 1994.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:9">
+<p>S. V. Adve and M. D. Hill,  <a href="https://dl.acm.org/doi/10.1145/325096.325100">Weak Ordering - A New Definition</a>.&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:10">
+<p>K. Gharachorloo, D. Lenoski, P. Gibbons, A. Gupta, and J. HeMessy,  <a href="http://people.eecs.berkeley.edu/~kubitron/cs252/handouts/papers/p376-gharachorloo.pdf">Memory Consistency and Event Ordering in Scalable Shared-Memory Multiprocessors</a>.&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:11">
+<p><a href="http://web.cecs.pdx.edu/~len/sql1999.pdf">ANSI/ISO/IEC International Standard (IS) Database Language SQL — Part 2: Foundation</a>, Sep. 1999.&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:12">
+<p>H. Berenson <em>et al.</em>, “<a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-95-51.pdf">A Critique of ANSI SQL Isolation Levels</a>,”, Jun. 1995.&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:13">
+<p>W. Hasenplaugh, A. Nguyen, and N. Shavit,  <a href="http://supertech.csail.mit.edu/papers/HasenplaughNgSh15.pdf">Quantifying the Capacity Limitations of Hardware Transactional Memory</a>.&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</main>
+
+  <footer>
+  
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4B68JJFZ6W', { 'anonymize_ip': false });
+}
+</script>
+
+
+  
+  <hr/>
+  © 2024 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>c&#43;&#43; on Jincheng Li</title>
+    <link>http://jincheng.li/tags/c&#43;&#43;/</link>
+    <description>Recent content in c&#43;&#43; on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 May 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The C&#43;&#43; Memory Model, or Why We Can&#39;t Have Nice Things</title>
+      <link>http://jincheng.li/post/cpp-mm/</link>
+      <pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+      <guid>http://jincheng.li/post/cpp-mm/</guid>
+      <description>This post gives a brief overview of the memory model problem, its history, and the approach taken by C++. Memory models are a notoriously difficult subject justifying book-length introductions, so many details are left out - I consider this post a refresher on the topic with links to relevant literature. Please see referenced materials in footnotes for a more serious introduction.&#xA;The Problem Here&amp;rsquo;s an over-simplified mental model of how a C++ program is executed on a computer:</description>
+    </item>
+  </channel>
+</rss>

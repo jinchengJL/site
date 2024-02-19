@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>bluecore on Jincheng Li</title>
+    <link>http://jincheng.li/tags/bluecore/</link>
+    <description>Recent content in bluecore on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 18 Apr 2018 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/bluecore/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Enforcing Email Frequency Caps</title>
+      <link>http://jincheng.li/post/email-frequency-cap/</link>
+      <pubDate>Thu, 29 Mar 2018 16:15:24 -0400</pubDate>
+      <guid>http://jincheng.li/post/email-frequency-cap/</guid>
+      <description>Enough with the Spamming: Enforcing Email Frequency Caps This is something I did at work around 2017. It talks about challenges involved in preventing our services from sending too many emails to the same address quickly.</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>computer architecture on Jincheng Li</title>
+    <link>http://jincheng.li/tags/computer-architecture/</link>
+    <description>Recent content in computer architecture on Jincheng Li</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 18 Apr 2018 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://jincheng.li/tags/computer-architecture/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Computer Architecture 101</title>
+      <link>http://jincheng.li/post/basic-comp-arch/</link>
+      <pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+      <guid>http://jincheng.li/post/basic-comp-arch/</guid>
+      <description>A review of basic computer architecture follows, partially inspired by linux-insides. I originally wrote this in 2016, but made edits later.&#xA;Von Neumann Machines Computers today are loosely based on the von Neumann architecture as shown above, with three major components &amp;ndash; CPU, I/O devices, and memory &amp;ndash; connected over buses (wires). The computer works as the CPU executes instructions that either read/write to memory, or interact with I/O devices.</description>
+    </item>
+  </channel>
+</rss>
