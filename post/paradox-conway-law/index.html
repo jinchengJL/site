@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Paradox of Conway&#39;s Law | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">The Paradox of Conway&rsquo;s Law</span></h1>
+
+<h2 class="date">2026/07/12</h2>
+</div>
+
+<main>
+<p>Conway’s Law is a widely known phenomenon that stipulates that (paraphrased) the communication structures of an organization dictate the technical architectures they produce. It’s one of those things that’s very obviously true once known, and you see it everywhere.</p>
+<p>One can loosely invert this and derive that the technical architecture of an organization dictates the possible options for its most efficient organizational structure.</p>
+<p>When a company is starting out, nobody really knows the best long-term technical architecture for a product. Partly because the product itself is still in flux. Partly because the founding engineers don’t yet have enough experience with the domain to intuit the best solutions.</p>
+<p>As the company grows, both the software and the organization start to scale, and the requirements start to change. Technical architecture receives overhauls, and the organizational structure with it. This causes a lot  of organizational pain since people do not like to suddenly have their ownership areas cancelled, or be responsible for new areas they may not be familiar with. And this isn’t just because people are selfish or stubborn - competent people need a prolonged period of time in a field to develop deep expertise and innovate, and as a technical organization you want  this to happen. Org wide changes are not conducive to that.</p>
+<p>The organizational pain manifests as production incidents due to ambiguous ownership, turf wars over shared responsibilities, gate keeping over contributions, etc. It is not pretty. The best people will leave. The product may turn into an unmaintainable mess in the process.</p>
+<p>To avoid it, naturally one must design an enduring technical architecture up front. This requires that one anticipates all of the requirements up front, and have deep domain specific knowledge when starting out, and that there are no industry-disrupting paradigm shifts. And one cannot overfit those requirements - lest they inevitably change in the near future.</p>
+<p>As you can imagine, this is basically impossible over a long-ish time horizon. One can get pretty close in specific circumstances with brilliant people, but that is the exception, not the norm. I think having a technical architecture last for even 5 years is asking a lot. Hence the paradox.</p>
+<p>What can we do about this?</p>
+<p>One solution is creating an organization that is not fragile to change. I feel like this is what early stage startups consisting mostly of 20-year-olds are good at. You can pivot. Trial and error. Responsibilities shift overnight. Everybody is on board with it.</p>
+<p>What if you have a larger org with a lot of technical depth, with mid-career folks having families to feed?</p>
+<p>This is a messy human problem so I don’t really know, but here are some possible options when faced with a technical direction change:</p>
+<ul>
+<li>wholesale re-org: announcing the direction change and re-org widely, tasking some new teams to lead the new direction</li>
+<li>the “inception”: giving some existing team ideas about the new direction, leading them into it, and hoping they’ll organize themselves around it</li>
+<li>outside help: bringing in new folks to lead the new direction and slowly replacing / absorbing the existing team</li>
+</ul>
+<p>Options 1 &amp; 3 will cause a lot of the aforementioned turmoil, so if you’d like to avoid that, they are not ideal.</p>
+<p>I think some variation of option 2 might be the best approach, but also the most difficult to pull off. I called it inception because it’s basically the maneuver used in the movie - make the teams think they stumbled onto the idea on their own, so it’s not a top-down mandate but a bottoms-up internal effort. Of course, in reality, no one is dumb enough to believe they can collectively inception the smartest folks in an entire organization to do their bidding, so there will be some mutual unspoken understanding among involved parties, but that’s fine. The key is that the effort has to originate from within the org, and the direction and the urgency has to be understood by the key stakeholders. At the end of the day, it should be clear to competent folks what the right technical direction is, and what the consequences are if they proceed along an existing suboptimal path for a long time.</p>
+<p>How would you pull off an inception maneuver? Well, certainly not by telling people what you are trying to do, like I’m doing in this blog post ;-) In seriousness, this is something I’ve yet to really need, but I do observe it from time to time, so do let me know if you have some advice.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

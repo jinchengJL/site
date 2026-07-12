@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Posts on Jincheng Li</title>
+		<link>http://jincheng.li/post/</link>
+		<description>Recent content in Posts on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 24 Mar 2026 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/post/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>The Paradox of Conway&#39;s Law</title>
+				<link>http://jincheng.li/post/paradox-conway-law/</link>
+				<pubDate>Sun, 12 Jul 2026 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/paradox-conway-law/</guid>
+				<description>&lt;p&gt;Conway’s Law is a widely known phenomenon that stipulates that (paraphrased) the communication structures of an organization dictate the technical architectures they produce. It’s one of those things that’s very obviously true once known, and you see it everywhere.&lt;/p&gt;&#xA;&lt;p&gt;One can loosely invert this and derive that the technical architecture of an organization dictates the possible options for its most efficient organizational structure.&lt;/p&gt;&#xA;&lt;p&gt;When a company is starting out, nobody really knows the best long-term technical architecture for a product. Partly because the product itself is still in flux. Partly because the founding engineers don’t yet have enough experience with the domain to intuit the best solutions.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>My AI-Driven Development Workflow</title>
+				<link>http://jincheng.li/post/ai-sdlc/</link>
+				<pubDate>Tue, 24 Mar 2026 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/ai-sdlc/</guid>
+				<description>&lt;p&gt;(No AI was used in the process of writing this article.)&lt;/p&gt;&#xA;&lt;p&gt;I’ve grown to like my current development workflow with AI, enough that I thought I’d share it. This may all become ancient history by next month, but at least it will be a faithful snapshot of what worked well in the era of Opus 4.6.&lt;/p&gt;&#xA;&lt;h2 id=&#34;the-workflow&#34;&gt;The Workflow&lt;/h2&gt;&#xA;&lt;h3 id=&#34;agent-loop&#34;&gt;Agent Loop&lt;/h3&gt;&#xA;&lt;p&gt;I have a (vibe-coded) Python loop running on a cloud VM that continuously polls a list of “resources” including Slack, Gitlab, and local git repo status to detect new content (e.g. messages, notes, dirty local state) since the last poll. When changes are detected, different types of resources are “linked” together via BFS to form a “work item”. For example, a work item might have a GitLab issue, plus a slack thread that created it, and PRs associated with it. The loop then invokes an LLM agent called the “coordinator” to process the work item. The coordinator’s primary job is to triage - decide an appropriate subagent to handle the work item. Its decision is fed back to the outer Python loop, which invokes that subagent to do the work.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Protocol Buffers are Great, Except...</title>
+				<link>http://jincheng.li/post/protocol-buffers-are-great/</link>
+				<pubDate>Fri, 26 Dec 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/protocol-buffers-are-great/</guid>
+				<description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;&#xA;&lt;p&gt;Serialization is one of those things that&amp;rsquo;s really tempting to build - it&amp;rsquo;s a constrained problem, has a simple abstraction with lots of depth behind it, is domain-specific so general-purpose solutions leave something to be desired, is relatively easy to test, and can be built and productionized within a reasonable amount of time by a solo engineer. As evidence, I can recall at least 10 different popular serialization formats off the top of my head: Protocol Buffers, JSON, BSON, MsgPack, Cap&amp;rsquo;n Proto, FlatBuffers, Simple Binary Encoding (SBE), cereal, Avro, Thrift, Arrow Flight, etc. And I&amp;rsquo;m sure this is missing a large number of alternatives.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Latency Numbers Every Programmer Should Know (2007 vs 2025)</title>
+				<link>http://jincheng.li/post/latency-numbers/</link>
+				<pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/latency-numbers/</guid>
+				<description>&lt;p&gt;Jeff &amp;amp; Sanjay published an updated version of the famous &amp;ldquo;Latency Numbers Every Programmer Should Know&amp;rdquo; from 2007. Below is a comparison of the two:&lt;/p&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;Operation&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;2007&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;2025&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;Speedup&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;L1 cache reference&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;0.5 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;0.5 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;1×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;L2 cache reference&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;7 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;3 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;2.3×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Branch mispredict&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;5 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;5 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;1×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Mutex lock / unlock&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;100 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;15 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;6.7×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Main memory reference&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;100 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;50 ns&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;2×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Compress 1 KB&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;10 µs&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;1 µs&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;10×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Read 4 KB (storage)&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;—&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;20 µs (SSD)&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;—&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Read 1 MB over network&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;10 ms (1 Gbps)&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;0.1 ms (100 Gbps)&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;100×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Read 1 MB from memory&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;250 µs&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;64 µs&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;3.9×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Datacenter round trip&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;500 µs&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;50 µs&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;10×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Disk seek&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;10 ms&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;5 ms&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;2×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Read 1 MB sequentially (disk)&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;30 ms&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;10 ms&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;3×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;CA ↔ Netherlands ↔ CA RTT&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;150 ms&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;150 ms&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;1×&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;Sources:&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>What Color is Your Library (LLM)</title>
+				<link>http://jincheng.li/post/what-color-is-your-library/</link>
+				<pubDate>Mon, 01 Sep 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/what-color-is-your-library/</guid>
+				<description>&lt;p&gt;While battling with linking and versioning issues with dynamically loaded shared libraries, it occurred to me that the function coloring metaphor is quite appropriate for shared libraries as well. So, here&amp;rsquo;s an LLM-generated post in the same style as the original function coloring piece, complete with the prompt that generated it. I found it pretty amusing and even somewhat useful.&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;In the style of &lt;a href=&#34;https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/&#34;&gt;https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/&lt;/a&gt;, write an article titled &amp;ldquo;what color is your library&amp;rdquo;. It explores the difficulties that shared libraries pose compared to static libraries, touches on how shared libraries are &amp;ldquo;red&amp;rdquo; libraries and are contagious, prone to make all other libraries in the project also become shared libraries. If appropriate, also explore alternative solutions in this space like the function article.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>The Case of Redis</title>
+				<link>http://jincheng.li/post/redis/</link>
+				<pubDate>Wed, 25 Jun 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/redis/</guid>
+				<description>&lt;p&gt;I have a bad habit of rolling my eyes at Redis when the topic comes up at work, without really giving well-grounded arguments as to why. I wanted to collect some of my thoughts on Redis here, in the hopes of crystallizing them into something useful.&lt;/p&gt;&#xA;&lt;p&gt;Redis occupies an interesting design space. It represents a unique blend of somewhat polarizing design decisions - I suspect that without Antirez at the helm, hardly anyone else would have made the same choices that shaped Redis into what it is today. This article will examine some interesting aspects of its design, how and why it got there, observe why it works for so many people, and share some of my own perspectives.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Plugins, Processes, Micro-services, Mono-Repos</title>
+				<link>http://jincheng.li/post/plugins/</link>
+				<pubDate>Sun, 22 Jun 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/plugins/</guid>
+				<description>&lt;p&gt;Plugins weren’t really much of a thing until recently in my career. Now that I&amp;rsquo;ve been exposed to them, they seem to show up everywhere, and for good reason. For a long time, my superficial understanding of plugins was that they were a way to extend the existing functionality of a piece of software. For example, browser extensions let you extend many aspects of the web-browsing experience on top of the browser itself. The browser provides a foundation that handles much of the complexity of the web, and the plugins work off that foundation.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Some Past Learnings</title>
+				<link>http://jincheng.li/post/past-learnings/</link>
+				<pubDate>Fri, 10 May 2024 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/past-learnings/</guid>
+				<description>&lt;p&gt;It&amp;rsquo;s now been a year since I left Google. I had a 5-year tenure there, which is somewhat long by today&amp;rsquo;s software industry standards and longer than I initially expected to stay around for. These are some of my reflections on both the experience of working there and the post-Google experience.&lt;/p&gt;&#xA;&lt;h2 id=&#34;some-background&#34;&gt;Some Background&lt;/h2&gt;&#xA;&lt;p&gt;I joined Google with a measly one year of industry experience working at a startup, and proceeded to spend the next five years working on something called network load balancing, the details of which I&amp;rsquo;ll go into some other time. Briefly, we provided an OSI layer-4 load balancing service that routed TCP/UDP/etc-protocol packets destined to some IP + port combinations to some user-configured servers. Reliability was a central theme for infrastructure services throughout my time there, so I&amp;rsquo;d estimate I spent at least 50% of my time on reliability initiatives and less than that on user-visible features. The dev team was very close-knit with several SRE teams - an experience I remain extremely grateful for.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Tech Interviews in China, circa 2022</title>
+				<link>http://jincheng.li/post/interviewing-in-china/</link>
+				<pubDate>Sun, 26 Feb 2023 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/interviewing-in-china/</guid>
+				<description>&lt;p&gt;I recently moved to China with my family and went through the process of looking for a new job in an unfamiliar and highly competitive market. I invested a significant amount of effort and time into the interviews, which made for an interesting experience. In this post, I&amp;rsquo;ll write about how I prepared for the interviews, the experience itself, and some thoughts around the process.&lt;/p&gt;&#xA;&lt;h2 id=&#34;quirks-of-tech-interviews-in-china&#34;&gt;Quirks of Tech Interviews in China&lt;/h2&gt;&#xA;&lt;h3 id=&#34;interview-format-and-content&#34;&gt;Interview Format and Content&lt;/h3&gt;&#xA;&lt;p&gt;Tech interviews in China have a lot in common with their US counterparts, but also many quirks. One example is what I&amp;rsquo;d call &amp;ldquo;acquired knowledge&amp;rdquo; questions, or pop quizzes. Topics range from programming language mechanics, to computer science fundamentals, to details of widely used production systems. For example, according to online forums, questions around Java&amp;rsquo;s implementation of hash maps, TCP 3-way handshake, Redis data structures, MySQL locking rules are fairly popular.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Zotero</title>
+				<link>http://jincheng.li/post/zotero/</link>
+				<pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/zotero/</guid>
+				<description>&lt;p&gt;&lt;a href=&#34;https://zotero.org/&#34;&gt;Zotero&lt;/a&gt; is an incredible piece of software. It is ostensibly a citation manager for academic researchers, but goes far beyond that. I don&amp;rsquo;t think it gets enough attention outside of academic circles, so here is an entire blog post appreciating how good it is.&lt;/p&gt;&#xA;&lt;p&gt;I discovered Zotero early last year from a random blog on the Internet. For a while I had been searching for a tool to organize my digital reading habits - consisting mostly of blog posts and academic papers - but it had never occurred to me to look for citation managers. It was immediately clear to me from the landing page that Zotero did everything I needed in one integrated solution, so I tried it out, and found that it not only did what it says on the tin, but had a few pleasant surprises in store. It quickly replaced all the other apps I had for similar purposes.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Consistency in Shared Memory Systems and Distributed Databases</title>
+				<link>http://jincheng.li/post/consistency-comparison/</link>
+				<pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/consistency-comparison/</guid>
+				<description>&lt;p&gt;It&amp;rsquo;s well known that many distributed consistency models come from the literature on shared memory multiprocessor systems. Intuitively, both systems need to present a consistent view of asynchronously replicated data to external clients (where replication in shared memory comes from caches), and therefore share the same underpinning theory. However, subtle differences between the two lead to their adoption of distinct consistency models. This is my attempt to explain the popular solutions for each system, and some observations on where the two diverge.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>The C&#43;&#43; Memory Model, or Why We Can&#39;t Have Nice Things</title>
+				<link>http://jincheng.li/post/cpp-mm/</link>
+				<pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/cpp-mm/</guid>
+				<description>&lt;p&gt;This post gives a brief overview of the memory model problem, its history, and the approach taken by C++. Memory models are a &lt;a href=&#34;http://jincheng.li/post/mm-warnings/&#34;&gt;notoriously difficult&lt;/a&gt; subject justifying book-length introductions, so many details are left out - I consider this post a refresher on the topic with links to relevant literature. Please see referenced materials in footnotes for a more serious introduction.&lt;/p&gt;&#xA;&lt;h2 id=&#34;the-problem&#34;&gt;The Problem&lt;/h2&gt;&#xA;&lt;p&gt;Here&amp;rsquo;s an over-simplified mental model of how a C++ program is executed on a computer:&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Warnings on Memory Models and Atomics</title>
+				<link>http://jincheng.li/post/mm-warnings/</link>
+				<pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/mm-warnings/</guid>
+				<description>&lt;p&gt;Against better judgement, I&amp;rsquo;ve gone down the rabbit hole of learning about memory models of various languages and systems. Before proceeding to the main content, it&amp;rsquo;s customary among such articles to notify the reader that coming anywhere close to memory models can be &lt;del&gt;too much fun&lt;/del&gt; ill-advised. Below are some examples I&amp;rsquo;ve collected. Please be warned :)&lt;/p&gt;&#xA;&lt;p&gt;Herb Sutter, &lt;a href=&#34;https://herbsutter.com/2013/02/11/atomic-weapons-the-c-memory-model-and-modern-hardware/&#34;&gt;atomic Weapons: The C++ Memory Model and Modern Hardware&lt;/a&gt;:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;It’s a session that includes topics I’ve publicly said for years is Stuff You Shouldn’t Need To Know and I Just Won’t Teach, but it’s becoming achingly clear that people do need to know about it. Achingly, heartbreakingly clear, because some hardware incents you to pull out the big guns to achieve top performance, and C++ programmers just are so addicted to full performance that they’ll reach for the big red levers with the flashing warning lights. Since we can’t keep people from pulling the big red levers, we’d better document the A to Z of what the levers actually do, so that people don’t &lt;a href=&#34;https://en.wikipedia.org/wiki/Scram&#34;&gt;SCRAM&lt;/a&gt; unless they really, really, really meant to.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Practical Hash Tables</title>
+				<link>http://jincheng.li/post/practical-hash-tables/</link>
+				<pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/practical-hash-tables/</guid>
+				<description>&lt;p&gt;This is a quick review of hash tables and some musings about their performance. The article was written in 2021, around the first time I needed to really pay attention to the performance and detailed design of hash tables. It comes off as fairly rudimentary to me now, and probably to you too if you know anything about performance optimization or CPU architecture. Please be warned.&lt;/p&gt;&#xA;&lt;h2 id=&#34;hash-tables-from-the-outside&#34;&gt;Hash tables: from the outside&lt;/h2&gt;&#xA;&lt;p&gt;Most languages come with standard library implementations of hash tables, usually presented as an associative array of (key, value) pairs. They support amortized constant-time lookup, insertion, removal of a key, and also iteration through all stored (key, value) pairs.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Computer Architecture 101</title>
+				<link>http://jincheng.li/post/basic-comp-arch/</link>
+				<pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+				<guid>http://jincheng.li/post/basic-comp-arch/</guid>
+				<description>&lt;p&gt;A review of basic computer architecture follows, partially inspired by &lt;a href=&#34;https://0xax.gitbooks.io/linux-insides/content/&#34;&gt;linux-insides&lt;/a&gt;. I originally wrote this in 2016, but made edits later.&lt;/p&gt;&#xA;&lt;h2 id=&#34;von-neumann-machines&#34;&gt;Von Neumann Machines&lt;/h2&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://jincheng.li/img/von_neumann.svg&#34; alt=&#34;von_neumann&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Computers today are loosely based on the &lt;a href=&#34;https://en.wikipedia.org/wiki/Von_Neumann_architecture&#34;&gt;von Neumann architecture&lt;/a&gt; as shown above, with three major components &amp;ndash; CPU, I/O devices, and memory &amp;ndash; connected over &lt;a href=&#34;https://en.wikipedia.org/wiki/Bus_(computing)&#34;&gt;buses&lt;/a&gt; (wires). The computer works as the CPU executes instructions that either read/write to memory, or interact with I/O devices.&lt;/p&gt;&#xA;&lt;p&gt;Notably, this model applies to &lt;em&gt;every&lt;/em&gt; piece of software running on a computer - they all get translated into machine instructions that the CPU carries out, which then interacts with other devices, which interacts with either more devices, or the human user. This includes every line of code in the BIOS, operating system, application, etc.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Enforcing Email Frequency Caps</title>
+				<link>http://jincheng.li/post/email-frequency-cap/</link>
+				<pubDate>Thu, 29 Mar 2018 16:15:24 -0400</pubDate>
+				<guid>http://jincheng.li/post/email-frequency-cap/</guid>
+				<description>&lt;h2 id=&#34;enough-with-the-spamming-enforcing-email-frequency-caps&#34;&gt;&lt;a href=&#34;https://medium.com/bluecore-engineering/enough-with-the-spamming-enforcing-email-frequency-caps-e325f2b74cad&#34;&gt;Enough with the Spamming: Enforcing Email Frequency Caps&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;This is something I did at work around 2017. It talks about challenges involved in preventing our services from sending too many emails to the same address quickly.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>PostgreSQL Query Optimization</title>
+				<link>http://jincheng.li/post/postgres-query-opt/</link>
+				<pubDate>Fri, 08 Apr 2016 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/postgres-query-opt/</guid>
+				<description>&lt;p&gt;This post gives a high-level explanation of Postgres query optimization. It assumes basic familiarity with relational databases and SQL queries.&lt;/p&gt;&#xA;&lt;h2 id=&#34;background&#34;&gt;Background&lt;/h2&gt;&#xA;&lt;p&gt;&lt;a href=&#34;http://www.postgresql.org/about&#34;&gt;PostgreSQL&lt;/a&gt;, or Postgres, is an open-source object-relational database management system. It has gone through around 30 years of development, has a ton of features, and is very popular within the database community. This post will focus on its query optimization routines, particularly how it optimizes join queries.&lt;/p&gt;&#xA;&lt;h2 id=&#34;query-optimization-101&#34;&gt;Query Optimization 101&lt;/h2&gt;&#xA;&lt;p&gt;Query optimization is the process of determining the best evaluation plan for a query, based on a limited amount of information about a database (e.g. metadata of its tables).&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

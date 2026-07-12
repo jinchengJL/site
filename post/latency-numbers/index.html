@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Latency Numbers Every Programmer Should Know (2007 vs 2025) | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Latency Numbers Every Programmer Should Know (2007 vs 2025)</span></h1>
+
+<h2 class="date">2025/12/20</h2>
+</div>
+
+<main>
+<p>Jeff &amp; Sanjay published an updated version of the famous &ldquo;Latency Numbers Every Programmer Should Know&rdquo; from 2007. Below is a comparison of the two:</p>
+<table>
+	<thead>
+			<tr>
+					<th>Operation</th>
+					<th>2007</th>
+					<th>2025</th>
+					<th>Speedup</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>L1 cache reference</td>
+					<td>0.5 ns</td>
+					<td>0.5 ns</td>
+					<td>1×</td>
+			</tr>
+			<tr>
+					<td>L2 cache reference</td>
+					<td>7 ns</td>
+					<td>3 ns</td>
+					<td>2.3×</td>
+			</tr>
+			<tr>
+					<td>Branch mispredict</td>
+					<td>5 ns</td>
+					<td>5 ns</td>
+					<td>1×</td>
+			</tr>
+			<tr>
+					<td>Mutex lock / unlock</td>
+					<td>100 ns</td>
+					<td>15 ns</td>
+					<td>6.7×</td>
+			</tr>
+			<tr>
+					<td>Main memory reference</td>
+					<td>100 ns</td>
+					<td>50 ns</td>
+					<td>2×</td>
+			</tr>
+			<tr>
+					<td>Compress 1 KB</td>
+					<td>10 µs</td>
+					<td>1 µs</td>
+					<td>10×</td>
+			</tr>
+			<tr>
+					<td>Read 4 KB (storage)</td>
+					<td>—</td>
+					<td>20 µs (SSD)</td>
+					<td>—</td>
+			</tr>
+			<tr>
+					<td>Read 1 MB over network</td>
+					<td>10 ms (1 Gbps)</td>
+					<td>0.1 ms (100 Gbps)</td>
+					<td>100×</td>
+			</tr>
+			<tr>
+					<td>Read 1 MB from memory</td>
+					<td>250 µs</td>
+					<td>64 µs</td>
+					<td>3.9×</td>
+			</tr>
+			<tr>
+					<td>Datacenter round trip</td>
+					<td>500 µs</td>
+					<td>50 µs</td>
+					<td>10×</td>
+			</tr>
+			<tr>
+					<td>Disk seek</td>
+					<td>10 ms</td>
+					<td>5 ms</td>
+					<td>2×</td>
+			</tr>
+			<tr>
+					<td>Read 1 MB sequentially (disk)</td>
+					<td>30 ms</td>
+					<td>10 ms</td>
+					<td>3×</td>
+			</tr>
+			<tr>
+					<td>CA ↔ Netherlands ↔ CA RTT</td>
+					<td>150 ms</td>
+					<td>150 ms</td>
+					<td>1×</td>
+			</tr>
+	</tbody>
+</table>
+<p>Sources:</p>
+<ul>
+<li>2025 <a href="https://abseil.io/fast/hints.html">https://abseil.io/fast/hints.html</a></li>
+<li>2007 <a href="https://static.googleusercontent.com/media/research.google.com/en//people/jeff/stanford-295-talk.pdf">https://static.googleusercontent.com/media/research.google.com/en//people/jeff/stanford-295-talk.pdf</a></li>
+</ul>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

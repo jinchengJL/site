@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My AI-Driven Development Workflow | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">My AI-Driven Development Workflow</span></h1>
+
+<h2 class="date">2026/03/24</h2>
+</div>
+
+<main>
+<p>(No AI was used in the process of writing this article.)</p>
+<p>I’ve grown to like my current development workflow with AI, enough that I thought I’d share it. This may all become ancient history by next month, but at least it will be a faithful snapshot of what worked well in the era of Opus 4.6.</p>
+<h2 id="the-workflow">The Workflow</h2>
+<h3 id="agent-loop">Agent Loop</h3>
+<p>I have a (vibe-coded) Python loop running on a cloud VM that continuously polls a list of “resources” including Slack, Gitlab, and local git repo status to detect new content (e.g. messages, notes, dirty local state) since the last poll. When changes are detected, different types of resources are “linked” together via BFS to form a “work item”. For example, a work item might have a GitLab issue, plus a slack thread that created it, and PRs associated with it. The loop then invokes an LLM agent called the “coordinator” to process the work item. The coordinator’s primary job is to triage - decide an appropriate subagent to handle the work item. Its decision is fed back to the outer Python loop, which invokes that subagent to do the work.</p>
+<p>For work items that require code changes (as opposed to e.g. simple Q&amp;A), there is a predefined <strong>development lifecycle</strong> described by agent prompts. The coordinator first creates a GitLab issue for the requested change, then a “planner” agent plans, addresses feedback, and re-plans until approved, then an “implementer” agent implements the plan and creates a PR, and finally a “shepherd” agent addresses CI failures and review comments - including both human reviews and AI reviews - until the PR is approved, and merges the PR.</p>
+<p>The human interacts with agents through Slack and Gitlab. Usually I would start the workflow from a slack message, then review plans from Slack (since plans are nice enough to read in Slack), then review code changes from Gitlab.</p>
+<p>The loop runs during working hours only, just to help me keep my sanity after work.</p>
+<h3 id="backend">Backend</h3>
+<p>We have a mono-repo setup built on top of regular git repos, so each work item gets its own “super-worktree”, internally consisting of worktrees of individual git repos. This also serves as a standalone bazel workspace. Once the agent invocation completes for a work item, we update local state to record all resources associated with the work item as done. Each work item is single threaded, but different work items can be dispatched in parallel, up to a configurable level of concurrency. I only have it set to 2 for now, which already seems like plenty since my day job isn’t about building vast greenfield projects.</p>
+<p>Different agent types can be configured to use different LLM backends - e.g. Claude Code with Opus for planner, Cursor CLI with GPT 5.4 for shepherd, Pi with Kimi 2.5 for implementer, etc. This is a crucial cost-saving measure and allows you to pick the exact intelligence level needed for a task. I might stretch this further to allow the coordinator to decide subagent model and backend type dynamically, based on user request. Backends also do usage/cost accounting and reports usage stats periodically.</p>
+<h3 id="summary">Summary</h3>
+<p>That’s it! The entire thing is maybe 5000 lines of Python plus command line tools like glab. No uv or pip, just stdlib. No databases either, just plain JSON files. The aforementioned local state is mostly just “cursors” recording the latest completed timestamp of each resource.</p>
+<h2 id="discussion">Discussion</h2>
+<p>This is effectively the traditional agile-like SDLC integrated with agents. You start with a ticket, pick it up, create a small plan, implement it, then get it reviewed and shipped. It works well for me for the following reasons:</p>
+<ul>
+<li>Prompts, plans, plan feedback, code, code review comments all become public artifacts. Everyone on the team, including agents, can see the lineage of reasoning that led to the current implementation.</li>
+<li>It integrates seamlessly existing development practices. Code and plan artifacts are placed natively in GitLab. Light discussions and status updates live in Slack. Gitlab issues become the ticketing and progress tracking system. Agents reduce the friction of filing tickets and linking Slack with Gitlab to nearly zero.</li>
+<li>Slack becomes a decent mobile UI for delegating tasks to agents. This has actually become my preferred way of interacting with agents - TUIs always felt like a bit of a compromise to me. Reading rendered markdown on web UIs is so much nicer.</li>
+<li>Gitlab issues becomes a great place for experimental ideas and nice-to-have improvements, with a team of agents working behind them. Whenever I have an idea for an experimental change, refactor, CI improvement, etc, I can simply fire off a slack message and expect an agent to create an issue and pick it up. Agents finish a lot of these tasks without much engineer time invested. This results in much better code health and drastically reduces maintenance burden.</li>
+</ul>
+<p>As a result of this workflow, I have now abandoned almost all JIRA board equivalents for my small team. Every requirement and idea that comes my way goes straight to the agent DM, which helps with triage. Issues assigned to the agent is the new team JIRA board. Simple changes are handled directly by the agent. More intricate ones sit there until a human has time to pick it up.</p>
+<p>Of course this hasn’t replaced the need for humans - humans plan milestones and roadmaps, and take on larger scope projects that require more context, direction, and cross-team collaboration. They also guide agents on changes and review their (frequently still subpar) output. Agents handle the grunt work.</p>
+<p>Why not use OpenClaw? Several reasons:</p>
+<ul>
+<li>OpenClaw is primarily a personal assistant. Building SDLC behavior into it requires plenty of customization anyway.</li>
+<li>The custom agent loop was quite easy to build. It’s also much simpler, tailored to my needs, and circumvents some of OpenClaw’s safety issues.</li>
+</ul>
+<p>The agent loop is currently single-user-only, acting like a personal developer team. The next step beyond this is probably more collaboration among agents and other developers - have the agent talk to humans to seek approval in public Slack channels, allow humans to assign tasks to other people&rsquo;s agents, make agents propose new work autonomously overnight, etc. I&rsquo;m sure other companies are already <a href="https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents">experimenting further</a>, so this is only one part of the solution.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

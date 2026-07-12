@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Linux on Jincheng Li</title>
+		<link>http://jincheng.li/tags/linux/</link>
+		<description>Recent content in Linux on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 18 Apr 2018 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Computer Architecture 101</title>
+				<link>http://jincheng.li/post/basic-comp-arch/</link>
+				<pubDate>Wed, 18 Apr 2018 14:56:57 -0400</pubDate>
+				<guid>http://jincheng.li/post/basic-comp-arch/</guid>
+				<description>&lt;p&gt;A review of basic computer architecture follows, partially inspired by &lt;a href=&#34;https://0xax.gitbooks.io/linux-insides/content/&#34;&gt;linux-insides&lt;/a&gt;. I originally wrote this in 2016, but made edits later.&lt;/p&gt;&#xA;&lt;h2 id=&#34;von-neumann-machines&#34;&gt;Von Neumann Machines&lt;/h2&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://jincheng.li/img/von_neumann.svg&#34; alt=&#34;von_neumann&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Computers today are loosely based on the &lt;a href=&#34;https://en.wikipedia.org/wiki/Von_Neumann_architecture&#34;&gt;von Neumann architecture&lt;/a&gt; as shown above, with three major components &amp;ndash; CPU, I/O devices, and memory &amp;ndash; connected over &lt;a href=&#34;https://en.wikipedia.org/wiki/Bus_(computing)&#34;&gt;buses&lt;/a&gt; (wires). The computer works as the CPU executes instructions that either read/write to memory, or interact with I/O devices.&lt;/p&gt;&#xA;&lt;p&gt;Notably, this model applies to &lt;em&gt;every&lt;/em&gt; piece of software running on a computer - they all get translated into machine instructions that the CPU carries out, which then interacts with other devices, which interacts with either more devices, or the human user. This includes every line of code in the BIOS, operating system, application, etc.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

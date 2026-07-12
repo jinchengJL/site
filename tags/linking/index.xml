@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Linking on Jincheng Li</title>
+		<link>http://jincheng.li/tags/linking/</link>
+		<description>Recent content in Linking on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 01 Sep 2025 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/linking/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>What Color is Your Library (LLM)</title>
+				<link>http://jincheng.li/post/what-color-is-your-library/</link>
+				<pubDate>Mon, 01 Sep 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/what-color-is-your-library/</guid>
+				<description>&lt;p&gt;While battling with linking and versioning issues with dynamically loaded shared libraries, it occurred to me that the function coloring metaphor is quite appropriate for shared libraries as well. So, here&amp;rsquo;s an LLM-generated post in the same style as the original function coloring piece, complete with the prompt that generated it. I found it pretty amusing and even somewhat useful.&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;In the style of &lt;a href=&#34;https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/&#34;&gt;https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/&lt;/a&gt;, write an article titled &amp;ldquo;what color is your library&amp;rdquo;. It explores the difficulties that shared libraries pose compared to static libraries, touches on how shared libraries are &amp;ldquo;red&amp;rdquo; libraries and are contagious, prone to make all other libraries in the project also become shared libraries. If appropriate, also explore alternative solutions in this space like the function article.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

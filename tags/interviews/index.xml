@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Interviews on Jincheng Li</title>
+		<link>http://jincheng.li/tags/interviews/</link>
+		<description>Recent content in Interviews on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Sun, 26 Feb 2023 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/interviews/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Tech Interviews in China, circa 2022</title>
+				<link>http://jincheng.li/post/interviewing-in-china/</link>
+				<pubDate>Sun, 26 Feb 2023 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/interviewing-in-china/</guid>
+				<description>&lt;p&gt;I recently moved to China with my family and went through the process of looking for a new job in an unfamiliar and highly competitive market. I invested a significant amount of effort and time into the interviews, which made for an interesting experience. In this post, I&amp;rsquo;ll write about how I prepared for the interviews, the experience itself, and some thoughts around the process.&lt;/p&gt;&#xA;&lt;h2 id=&#34;quirks-of-tech-interviews-in-china&#34;&gt;Quirks of Tech Interviews in China&lt;/h2&gt;&#xA;&lt;h3 id=&#34;interview-format-and-content&#34;&gt;Interview Format and Content&lt;/h3&gt;&#xA;&lt;p&gt;Tech interviews in China have a lot in common with their US counterparts, but also many quirks. One example is what I&amp;rsquo;d call &amp;ldquo;acquired knowledge&amp;rdquo; questions, or pop quizzes. Topics range from programming language mechanics, to computer science fundamentals, to details of widely used production systems. For example, according to online forums, questions around Java&amp;rsquo;s implementation of hash maps, TCP 3-way handshake, Redis data structures, MySQL locking rules are fairly popular.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

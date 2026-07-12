@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Architecture on Jincheng Li</title>
+		<link>http://jincheng.li/tags/architecture/</link>
+		<description>Recent content in Architecture on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 23 Jun 2025 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/architecture/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Plugins, Processes, Micro-services, Mono-Repos</title>
+				<link>http://jincheng.li/post/plugins/</link>
+				<pubDate>Sun, 22 Jun 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/plugins/</guid>
+				<description>&lt;p&gt;Plugins weren’t really much of a thing until recently in my career. Now that I&amp;rsquo;ve been exposed to them, they seem to show up everywhere, and for good reason. For a long time, my superficial understanding of plugins was that they were a way to extend the existing functionality of a piece of software. For example, browser extensions let you extend many aspects of the web-browsing experience on top of the browser itself. The browser provides a foundation that handles much of the complexity of the web, and the plugins work off that foundation.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

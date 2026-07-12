@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Career on Jincheng Li</title>
+		<link>http://jincheng.li/tags/career/</link>
+		<description>Recent content in Career on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 10 May 2024 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/career/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Some Past Learnings</title>
+				<link>http://jincheng.li/post/past-learnings/</link>
+				<pubDate>Fri, 10 May 2024 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/past-learnings/</guid>
+				<description>&lt;p&gt;It&amp;rsquo;s now been a year since I left Google. I had a 5-year tenure there, which is somewhat long by today&amp;rsquo;s software industry standards and longer than I initially expected to stay around for. These are some of my reflections on both the experience of working there and the post-Google experience.&lt;/p&gt;&#xA;&lt;h2 id=&#34;some-background&#34;&gt;Some Background&lt;/h2&gt;&#xA;&lt;p&gt;I joined Google with a measly one year of industry experience working at a startup, and proceeded to spend the next five years working on something called network load balancing, the details of which I&amp;rsquo;ll go into some other time. Briefly, we provided an OSI layer-4 load balancing service that routed TCP/UDP/etc-protocol packets destined to some IP + port combinations to some user-configured servers. Reliability was a central theme for infrastructure services throughout my time there, so I&amp;rsquo;d estimate I spent at least 50% of my time on reliability initiatives and less than that on user-visible features. The dev team was very close-knit with several SRE teams - an experience I remain extremely grateful for.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

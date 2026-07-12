@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Ai on Jincheng Li</title>
+		<link>http://jincheng.li/tags/ai/</link>
+		<description>Recent content in Ai on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 24 Mar 2026 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/ai/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>My AI-Driven Development Workflow</title>
+				<link>http://jincheng.li/post/ai-sdlc/</link>
+				<pubDate>Tue, 24 Mar 2026 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/ai-sdlc/</guid>
+				<description>&lt;p&gt;(No AI was used in the process of writing this article.)&lt;/p&gt;&#xA;&lt;p&gt;I’ve grown to like my current development workflow with AI, enough that I thought I’d share it. This may all become ancient history by next month, but at least it will be a faithful snapshot of what worked well in the era of Opus 4.6.&lt;/p&gt;&#xA;&lt;h2 id=&#34;the-workflow&#34;&gt;The Workflow&lt;/h2&gt;&#xA;&lt;h3 id=&#34;agent-loop&#34;&gt;Agent Loop&lt;/h3&gt;&#xA;&lt;p&gt;I have a (vibe-coded) Python loop running on a cloud VM that continuously polls a list of “resources” including Slack, Gitlab, and local git repo status to detect new content (e.g. messages, notes, dirty local state) since the last poll. When changes are detected, different types of resources are “linked” together via BFS to form a “work item”. For example, a work item might have a GitLab issue, plus a slack thread that created it, and PRs associated with it. The loop then invokes an LLM agent called the “coordinator” to process the work item. The coordinator’s primary job is to triage - decide an appropriate subagent to handle the work item. Its decision is fed back to the outer Python loop, which invokes that subagent to do the work.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

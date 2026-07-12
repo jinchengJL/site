@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Management on Jincheng Li</title>
+		<link>http://jincheng.li/tags/management/</link>
+		<description>Recent content in Management on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 12 Jul 2025 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/management/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>The Paradox of Conway&#39;s Law</title>
+				<link>http://jincheng.li/post/paradox-conway-law/</link>
+				<pubDate>Sun, 12 Jul 2026 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/paradox-conway-law/</guid>
+				<description>&lt;p&gt;Conway’s Law is a widely known phenomenon that stipulates that (paraphrased) the communication structures of an organization dictate the technical architectures they produce. It’s one of those things that’s very obviously true once known, and you see it everywhere.&lt;/p&gt;&#xA;&lt;p&gt;One can loosely invert this and derive that the technical architecture of an organization dictates the possible options for its most efficient organizational structure.&lt;/p&gt;&#xA;&lt;p&gt;When a company is starting out, nobody really knows the best long-term technical architecture for a product. Partly because the product itself is still in flux. Partly because the founding engineers don’t yet have enough experience with the domain to intuit the best solutions.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

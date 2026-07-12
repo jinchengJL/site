@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Multiprocessor on Jincheng Li</title>
+		<link>http://jincheng.li/tags/multiprocessor/</link>
+		<description>Recent content in Multiprocessor on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 28 May 2022 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/multiprocessor/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>The C&#43;&#43; Memory Model, or Why We Can&#39;t Have Nice Things</title>
+				<link>http://jincheng.li/post/cpp-mm/</link>
+				<pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/cpp-mm/</guid>
+				<description>&lt;p&gt;This post gives a brief overview of the memory model problem, its history, and the approach taken by C++. Memory models are a &lt;a href=&#34;http://jincheng.li/post/mm-warnings/&#34;&gt;notoriously difficult&lt;/a&gt; subject justifying book-length introductions, so many details are left out - I consider this post a refresher on the topic with links to relevant literature. Please see referenced materials in footnotes for a more serious introduction.&lt;/p&gt;&#xA;&lt;h2 id=&#34;the-problem&#34;&gt;The Problem&lt;/h2&gt;&#xA;&lt;p&gt;Here&amp;rsquo;s an over-simplified mental model of how a C++ program is executed on a computer:&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Warnings on Memory Models and Atomics</title>
+				<link>http://jincheng.li/post/mm-warnings/</link>
+				<pubDate>Sat, 28 May 2022 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/mm-warnings/</guid>
+				<description>&lt;p&gt;Against better judgement, I&amp;rsquo;ve gone down the rabbit hole of learning about memory models of various languages and systems. Before proceeding to the main content, it&amp;rsquo;s customary among such articles to notify the reader that coming anywhere close to memory models can be &lt;del&gt;too much fun&lt;/del&gt; ill-advised. Below are some examples I&amp;rsquo;ve collected. Please be warned :)&lt;/p&gt;&#xA;&lt;p&gt;Herb Sutter, &lt;a href=&#34;https://herbsutter.com/2013/02/11/atomic-weapons-the-c-memory-model-and-modern-hardware/&#34;&gt;atomic Weapons: The C++ Memory Model and Modern Hardware&lt;/a&gt;:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;It’s a session that includes topics I’ve publicly said for years is Stuff You Shouldn’t Need To Know and I Just Won’t Teach, but it’s becoming achingly clear that people do need to know about it. Achingly, heartbreakingly clear, because some hardware incents you to pull out the big guns to achieve top performance, and C++ programmers just are so addicted to full performance that they’ll reach for the big red levers with the flashing warning lights. Since we can’t keep people from pulling the big red levers, we’d better document the A to Z of what the levers actually do, so that people don’t &lt;a href=&#34;https://en.wikipedia.org/wiki/Scram&#34;&gt;SCRAM&lt;/a&gt; unless they really, really, really meant to.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

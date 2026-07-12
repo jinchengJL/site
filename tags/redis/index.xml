@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Redis on Jincheng Li</title>
+		<link>http://jincheng.li/tags/redis/</link>
+		<description>Recent content in Redis on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 25 Jun 2025 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/redis/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>The Case of Redis</title>
+				<link>http://jincheng.li/post/redis/</link>
+				<pubDate>Wed, 25 Jun 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/redis/</guid>
+				<description>&lt;p&gt;I have a bad habit of rolling my eyes at Redis when the topic comes up at work, without really giving well-grounded arguments as to why. I wanted to collect some of my thoughts on Redis here, in the hopes of crystallizing them into something useful.&lt;/p&gt;&#xA;&lt;p&gt;Redis occupies an interesting design space. It represents a unique blend of somewhat polarizing design decisions - I suspect that without Antirez at the helm, hardly anyone else would have made the same choices that shaped Redis into what it is today. This article will examine some interesting aspects of its design, how and why it got there, observe why it works for so many people, and share some of my own perspectives.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

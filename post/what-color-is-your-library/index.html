@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>What Color is Your Library (LLM) | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">What Color is Your Library (LLM)</span></h1>
+
+<h2 class="date">2025/09/01</h2>
+</div>
+
+<main>
+<p>While battling with linking and versioning issues with dynamically loaded shared libraries, it occurred to me that the function coloring metaphor is quite appropriate for shared libraries as well. So, here&rsquo;s an LLM-generated post in the same style as the original function coloring piece, complete with the prompt that generated it. I found it pretty amusing and even somewhat useful.</p>
+<blockquote>
+<p>In the style of <a href="https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/">https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/</a>, write an article titled &ldquo;what color is your library&rdquo;. It explores the difficulties that shared libraries pose compared to static libraries, touches on how shared libraries are &ldquo;red&rdquo; libraries and are contagious, prone to make all other libraries in the project also become shared libraries. If appropriate, also explore alternative solutions in this space like the function article.</p>
+</blockquote>
+<p>You’ve seen this before.</p>
+<p>You start with a clean, fast, blue world: one statically linked executable, everything compiled together, LTO humming, symbols private, nothing surprising at runtime.</p>
+<p>Then someone says, “We need a plugin.” Or “We’ll ship a shared core so other teams can embed us.” You flip one target to a .so, add -fPIC a couple places, and—whoops—the color bleeds. Your build turns red.</p>
+<p>Shared libraries are red libraries. They’re contagious. Once one shows up, it wants your whole graph.</p>
+<hr>
+<h2 id="blue-vs-red-static-vs-shared">Blue vs. red (static vs. shared)</h2>
+<ul>
+<li>Blue (static): link-time composition, one artifact, whole-program optimization, reproducible startup, no loader puzzles. ABI doesn’t leak across component boundaries because there aren’t any.</li>
+<li>Red (shared): runtime composition, the dynamic loader sits between you and your code, ABI freezes at the boundary, search paths matter, symbol interposition can bite, and position independence becomes a property you carry everywhere.</li>
+</ul>
+<p>Both have their place. But red brings rules that blue code never had to obey—and those rules spread.</p>
+<hr>
+<h2 id="why-red-spreads">Why red spreads</h2>
+<h3 id="1-pic-tax-is-transitive">1) PIC tax is transitive</h3>
+<p>On ELF platforms, if a shared object depends on static archives, those archives must have been compiled with PIC (e.g., -fPIC or -fpic). If they weren’t, you hit errors like:</p>
+<p>relocation R_X86_64_32 against `.text&rsquo; can not be used when making a shared object; recompile with -fPIC</p>
+<p>So your brand-new libcore.so can’t consume yesterday’s comfortable libalgo.a unless you rebuild libalgo with PIC. And if libalgo depends on libutil.a, that needs PIC too. One red target forces a red rebuild of its entire static closure.</p>
+<p>People try to dodge by “just link the .a into the final binary and dlopen the .so separately.” That only works if the shared object doesn’t pull on those .as. The moment it does, you’re back to repainting.</p>
+<h3 id="2-abis-harden-at-boundaries">2) ABIs harden at boundaries</h3>
+<p>Red turns implementation details into promises:</p>
+<ul>
+<li>Inline &amp; templates: in blue, you can inline/instantiate freely. In red, headers that bleed inlines across the boundary pin client and server to identical compilers/libstdc++ ABIs. Breaks appear as ODR potholes and “worked in dev, crashed in prod.”</li>
+<li>Exceptions/RTTI: crossing a .so boundary with C++ exceptions or polymorphic types couples you to allocator, unwinder, and RTTI layout details. Upgrading one side silently changes behavior on the other.</li>
+<li>Interposition: any non-hidden symbol might be replaced by a different definition from another .so. You thought you called your logger; you actually called someone else’s.</li>
+</ul>
+<p>The fix is discipline—visibility hygiene, C-shaped APIs, versioned symbols—but that’s work. And once one boundary exists, you need that discipline everywhere that boundary touches.</p>
+<h3 id="3-the-loader-is-now-part-of-your-system">3) The loader is now part of your system</h3>
+<p>The dynamic loader resolves search paths and symbol bindings based on DT_NEEDED, RPATH/RUNPATH, LD_LIBRARY_PATH, and dlopen flags (RTLD_LOCAL/RTLD_GLOBAL). The order you load things can change which functions get called. $ORIGIN becomes a design decision, not an afterthought.</p>
+<p>If your program was blue yesterday, nobody on the team internalized these rules. Introduce one .so, and every deploy script, container, and CI job now has to care.</p>
+<h3 id="4-performance-shifts">4) Performance shifts</h3>
+<p>Modern x86-64 PIC overhead is usually modest, but it’s not zero—extra indirections through GOT/PLT, fewer cross-module inlines, more conservative devirtualization. Startup relocations and symbol lookups show up in tail latency. If your world is ultra-low-latency, these details matter. Turning one central library red pushes PIC and PLT decisions across everything that touches it.</p>
+<hr>
+<h2 id="why-people-choose-red-anyway">Why people choose red anyway</h2>
+<ul>
+<li>Plugins &amp; scripting: load at runtime, optional features, third-party extensions.</li>
+<li>Independent upgrades: patch a component without relinking the world.</li>
+<li>Footprint: multiple processes can share code pages from a single .so.</li>
+<li>Licensing &amp; packaging: some ecosystems expect shared objects.</li>
+</ul>
+<p>All valid. Just don’t pretend the rest of the code can stay innocent.</p>
+<hr>
+<h2 id="a-field-guide-to-red-contagion">A field guide to red contagion</h2>
+<p>Symptoms you’ll see after introducing one .so:</p>
+<ul>
+<li>-fPIC shows up in “unrelated” libraries.</li>
+<li>Build system sprinkles twin targets: mylib and mylib.pic.</li>
+<li>Someone proposes -Wl,&ndash;whole-archive to cram old .as into a .so.</li>
+<li>You start arguing about RPATH vs RUNPATH and $ORIGIN.</li>
+<li>A segfault disappears when you export fewer symbols (visibility).</li>
+<li>A perf regression vanishes when you turn off interposition (-Bsymbolic-functions).</li>
+<li>You add a “stable C SDK” doc because C++ across the boundary hurt.</li>
+</ul>
+<p>Congrats: your project is red now.</p>
+<hr>
+<h2 id="surviving-in-a-red-world">Surviving in a red world</h2>
+<p>If you must be red, be intentionally red.</p>
+<ol>
+<li>Draw narrow, explicit, C-shaped boundaries</li>
+</ol>
+<ul>
+<li>Expose a C ABI (extern &ldquo;C&rdquo;) with POD structs and lengths. No STL types, no exceptions across the boundary.</li>
+<li>Use pimpl on the C++ side so you can evolve internals without ABI breakage.
+- Put stable headers in a sdk/ directory. Freeze them like an API, not like a header convenience.</li>
+</ul>
+<ol start="2">
+<li>Hide everything else</li>
+</ol>
+<ul>
+<li>
+<p>Compile with -fvisibility=hidden and export only what’s public (linker version script or <strong>attribute</strong>((visibility(&ldquo;default&rdquo;)))).</p>
+</li>
+<li>
+<p>Consider -Wl,-Bsymbolic-functions to reduce interposition surprises inside a .so.
+3.	Version and police your ABI</p>
+</li>
+<li>
+<p>Give the library a SONAME and use symbol versioning if you truly need multiple ABI generations.</p>
+</li>
+<li>
+<p>Add CI that fails if new exports appear: nm -D, objdump -T, compare against a baseline.</p>
+</li>
+<li>
+<p>Force closure: -Wl,-z,defs so missing dependencies trip the link, not runtime.</p>
+</li>
+</ul>
+<ol start="4">
+<li>Tame the loader</li>
+</ol>
+<ul>
+<li>Prefer RUNPATH with $ORIGIN/&hellip; over global LD_LIBRARY_PATH.</li>
+<li>Use dlopen(&hellip;, RTLD_LOCAL) unless you want intentional symbol sharing.</li>
+</ul>
+<ol start="5">
+<li>Control performance</li>
+</ol>
+<ul>
+<li>Build everything that participates with PIC; measure with and without PLT optimizations (-fno-plt) and LTO-enabled shared libs if your toolchain supports it.</li>
+<li>Keep hot call paths inside a single module when possible.</li>
+</ul>
+<hr>
+<h2 id="alternatives-choose-your-palette-up-front">Alternatives (choose your palette up front)</h2>
+<h3 id="a-stay-purely-blue-static-all-the-way">A) Stay purely blue (static all the way)</h3>
+<ul>
+<li>One binary, fully static (or at least statically link your stack except for the C library).</li>
+<li>Great for hermetic, reproducible deployments and low latency.</li>
+<li>Downsides: larger artifacts; security updates require rebuild; fully static glibc can be painful—musl helps if you can switch.</li>
+</ul>
+<p>When to pick: servers you own end-to-end, no third-party plugins, strong perf/repro needs.</p>
+<h3 id="b-red-islands-on-a-blue-sea">B) Red islands on a blue sea</h3>
+<p>Keep the application and internal libs static. Introduce one red boundary for plugins:</p>
+<ul>
+<li>Define a small C ABI (create_plugin, destroy_plugin, process()).</li>
+<li>Vendor or statically link a plugin’s internal dependencies into the plugin to avoid global symbol collisions.</li>
+<li>Expose only the plugin API; hide the rest with visibility controls.</li>
+<li>Load plugins with RTLD_LOCAL and pass opaque handles, not STL, across the boundary.</li>
+</ul>
+<p>This keeps most of the graph blue and confines red rules to a small, well-documented island.</p>
+<h3 id="c-separate-process-instead-of-so">C) Separate process instead of .so</h3>
+<p>Use IPC (Unix domain sockets, shared memory ring buffers, memfd) to compose. You pay a crossing cost, but you get:</p>
+<ul>
+<li>No ABI coupling, no loader games, crash isolation, language freedom.</li>
+<li>With careful shared-memory design, the overhead can be microseconds. For UI tools and many services, it’s a no-brainer. For in-the-loop trading paths, maybe not.</li>
+</ul>
+<h3 id="d-ship-shared-build-blue">D) “Ship shared, build blue”</h3>
+<p>Internally build statically to keep sanity and performance. At publish time, produce a red distribution by carving out a few shared components with crystal-clear ABIs. Treat that split as a release-engineering step, not how developers work day-to-day.</p>
+<h3 id="e-header-only-or-static-preferred-dependencies">E) Header-only or static-preferred dependencies</h3>
+<p>For third-party libs under your control, prefer header-only or static builds. If you must depend on a vendor .so, put a thin adapter around it and keep the rest blue.</p>
+<hr>
+<p>Practical build hygiene (CMake/Bazel-ish)</p>
+<ul>
+<li>Produce both PIC and non-PIC variants where needed:</li>
+<li>CMake: set POSITION_INDEPENDENT_CODE on targets that may end up in .sos; keep others off.</li>
+<li>Bazel: split cc_library into :mylib (non-PIC static) and :mylib.pic (PIC) and depend on the right one per context.</li>
+<li>Uniform toolchain switches: exceptions, RTTI, allocators. Mismatches become heisenbugs across red boundaries.</li>
+<li>Export maps / version scripts checked into sdk/. CI diff them on every change.</li>
+<li>Audit artifacts: readelf -d, ldd, nm -D, and objdump -x in a release job. Fail on unexpected NEEDED, stray RPATH, or unapproved exports.</li>
+</ul>
+<hr>
+<p>The moral</p>
+<p>Color is a property that propagates.</p>
+<p>If you choose blue, protect it: say no to casual plugins and enforce a static-first toolchain.
+If you choose red, embrace it: draw tight C ABIs, hide your guts, police exports, and script the loader.</p>
+<p>What doesn’t work is pretending a red decision can live quietly in a blue world. It won’t. One shared library invites the loader, ABI stability, PIC, and interposition to your party—and they don’t mingle politely.</p>
+<p>Pick your color early. Make the boundary small. And whatever you do, don’t let accidental red repaint the whole house.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

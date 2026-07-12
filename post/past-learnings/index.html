@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Some Past Learnings | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Some Past Learnings</span></h1>
+
+<h2 class="date">2024/05/10</h2>
+</div>
+
+<main>
+<p>It&rsquo;s now been a year since I left Google. I had a 5-year tenure there, which is somewhat long by today&rsquo;s software industry standards and longer than I initially expected to stay around for. These are some of my reflections on both the experience of working there and the post-Google experience.</p>
+<h2 id="some-background">Some Background</h2>
+<p>I joined Google with a measly one year of industry experience working at a startup, and proceeded to spend the next five years working on something called network load balancing, the details of which I&rsquo;ll go into some other time. Briefly, we provided an OSI layer-4 load balancing service that routed TCP/UDP/etc-protocol packets destined to some IP + port combinations to some user-configured servers. Reliability was a central theme for infrastructure services throughout my time there, so I&rsquo;d estimate I spent at least 50% of my time on reliability initiatives and less than that on user-visible features. The dev team was very close-knit with several SRE teams - an experience I remain extremely grateful for.</p>
+<h2 id="learnings">Learnings</h2>
+<p>What does working at Google teach someone?</p>
+<p>Google does a very good job of teaching someone transferable software engineering skills <em>over an extended period of time</em>. In particular, how to build <em>reliable, high-throughput</em> systems. This includes both the technical aspects and the processes around it. A lot of this learning happens implicitly, without the person necessarily realizing it - for example, I never bothered to read a <a href="https://abseil.io/resources/swe-book">lengthy book about software engineering processes at Google</a> while there, but a lot of the contents in the book were conveyed to engineers via little text snippets, or through behavior and company culture, rather than words. It&rsquo;s only after working elsewhere that I started to appreciate these past learnings: things like API design, coding in C++, testing, computer networks, distributed systems, how to deal with legacy code and software rewrites, how to operate software reliably, how to conduct code reviews, how to write and review design docs, etc. The list goes on.</p>
+<p>That said, perhaps not all of these are that interesting: one will become better at software engineering as long as one works on software, regardless of the company. What&rsquo;s unique about the experience at Google?</p>
+<p>The thing that stands out to me is that a lot of software engineering at Google can be associated with &ldquo;boring&rdquo;. This boring-ness manifests in many different ways:</p>
+<ul>
+<li>You&rsquo;ll work on boring things like writing layers of tests at different abstraction levels to verify the same thing, or integrating a shiny new system that someone else implemented with a legacy system to gradually replace the latter, or fixing broken things that no one has paid attention to in months or years, or arguing with extremely nit-picky reviewers whose comments may or may not matter in the long run, etc.</li>
+<li>You&rsquo;ll find that the developer tooling is so excellent that there is little need to invent your own tools or scripts. The process of managing changes and submitting code becomes boring.</li>
+<li>You&rsquo;ll find that everything needed to build a reliable web service already exists. There is an internal solution (or probably multiple solutions) for RPC, caching, http servers / clients, distributed consensus, file storage, geo-replication, database, serialization formats, multi-threading libraries, testing frameworks, metrics, alerting, rollouts, data analysis, access control, etc. All of them are excellent and supports anywhere from one user to a planet of users. There is no need for you to solve any problems there.</li>
+<li>If you enjoy writing code a certain way and <a href="http://antirez.com/news/133">see that as a form of self-expression</a>, you&rsquo;ll find your artistic freedom severely limited. There are pages after pages of style guides with detailed reasoning codify-ing the approved way to write code at Google, and reviewers will be encouraged to point out any non-compliant code, no matter the circumstance. A lot of what one might consider a personal touch will get you yelled at instead.</li>
+<li>Making changes happen can be a slow, difficult, occasionally frustrating experience. A single change may go through many rounds of review, and then sit for weeks before rolling out to production. The feedback loop is long.</li>
+</ul>
+<p>I&rsquo;ve intentionally framed the above in a somewhat negative manner. Let me now explain why I find this boringness to be the good kind - the kind that leads to reliable software.</p>
+<h3 id="engineering-excellence-down-to-the-tiniest-details">Engineering Excellence, Down To The Tiniest Details</h3>
+<p>Google is built around a culture of engineering excellence, and hires swaths of talented engineers to work on both interesting and boring problems, which means people at the company spend an ungodly amount of time arguing about the tiniest details of their software. Despite how this sounds, it has its perks: you get things like the <a href="https://google.github.io/styleguide/">Google style guides</a>, <a href="https://abseil.io/tips/">C++ Tips of the Week</a>, access to excellent foundational libraries in your primary programming language, high-quality language discussions with industry experts, extremely nit-picky code reviews, expert opinion pieces on the minutia of programming (e.g. when to use debug assertions? should we use long descriptive names or shorter less-descriptive ones?), among other niceties.</p>
+<p>For someone with lots of experience and strong prior opinions on how things should be done, the above can be a nuisance (and indeed it is for many), but for someone closer to a fresh out-of-school graduate, this <em>prescriptive</em> style of programming is an immense gift. The Google way of programming may not be best for every situation, but it is most certainly better than whatever style of programming the <em>average</em> new-grad (myself included) is able to come up with.</p>
+<p>That said, since leaving, I&rsquo;m finding that Google&rsquo;s restrictive programming style can be quite controversial out in the wild, even among experienced folks. You can find clusters of ex-Googlers that shape a certain team or company into Google&rsquo;s coding standards, but other than that, it is a rare occurrence. In the project I&rsquo;m currently working on, I&rsquo;m trying to strike a balance between the wholesale &ldquo;Google way&rdquo; and &ldquo;go to town with your personal style&rdquo;. I do believe there are pieces of the Google&rsquo;s C++ style (plus the abseil tips) that are overly restrictive, and some rules that are simply too difficult to enforce without Google&rsquo;s level of tooling and manpower, but I also believe that around 80% of it is pretty solid anywhere.</p>
+<h3 id="developer-tooling">Developer Tooling</h3>
+<p>Working in a monorepo with all its quirks worked out is, well, not something you tend to forget. Theoretically, it shouldn&rsquo;t be <em>that</em> hard to achieve parity with Google&rsquo;s developer tooling in a smaller company or in the open-source world - a lot of the pieces like distributed hermetic builds, distributed VCS, code search, remote IDEs, code review tools, etc are available out in the open, but for some reason the complete experience hasn&rsquo;t been widely adopted. Perhaps the prevalence of Github made it much harder to adopt a monorepo mindset.</p>
+<p>Writing code in a well-supported monorepo is the best kind of <strong>boring</strong>. Note I&rsquo;m <strong>not</strong> talking about thinking / designing / reviewing / arguing about code, just the process of writing and submitting code once everybody agree on what to do and how to do it. You write the code, test it, push, wait for automated tools and reviewer approval, then submit the change. That&rsquo;s it. Once you overcome the initial hurdle of learning development tools like <a href="https://en.wikipedia.org/wiki/Bazel_%28software%29">Bazel</a>, <a href="https://en.wikipedia.org/wiki/Mercurial">Mercurial</a>, CodeSearch, the VSCode-like internal IDE, pretty quickly there comes a point where the development workflow will no longer give you any surprises. Things just work. The code you wrote shows up indexed on CodeSearch. The test you wrote keeps passing, with all test logs saved somewhere. Nothing gets lost, not even intermediate uncommitted work - thanks to the distributed filesystem hosting the code.</p>
+<p>I will say one negative thing about Google&rsquo;s monorepo: I believe it&rsquo;s too good for its own sake. Many things that does not need to be code is turned into code because that&rsquo;s what everybody understands. For example, a team&rsquo;s on-call schedule shouldn&rsquo;t have to be defined in a DSL and submitted into version control; simple monitoring dashboards also shouldn&rsquo;t need to be code.</p>
+<h3 id="infrastructure">Infrastructure</h3>
+<p>Tales of Google’s amazing internal infrastructure abound, so I won’t repeat them here. Probably, the most impressive piece of technology to me is Google’s global network, both the WAN and the intra-datacenter networks, but that’s because I worked on a part of it. Borg itself is also a serious contender.</p>
+<p>I <em>don’t</em> think Google’s internal solution for <a href="https://research.google/pubs/monarch-googles-planet-scale-in-memory-time-series-database/">metrics and monitoring</a> is as impressive. It’s probably still one of the most scalable monitoring system in the world, but the frontend is not very easy to use, and Datadog handily beats it. It’s still much better than the open source Prometheus stack, though. Also, <a href="https://sre.google/sre-book/practical-alerting/">Borgmon</a> should be buried in its grave by now.</p>
+<p>While this impressive infrastructure all sounds amazing, actually using them is a different story. Pretty much every one of these tools has a bit of a learning curve. The older the tool is, the steeper the curve. This is the &ldquo;boring&rdquo; aspect of outstanding infrastructure - most of the amazing tech has already been built, and what&rsquo;s left is maintaining them and putting up with their quirks. See &ldquo;Everything is Medium Hard&rdquo; below.</p>
+<h3 id="code-reviews">Code Reviews</h3>
+<p>Those who are familiar with Google’s coding standards will be aware of its reputation for stringent code reviews. This is a core part of Google’s engineering culture. Outside of the company, people tend to be taken aback by the attention to detail in such code reviews and the sheer amount of comments, largely in the form of nitpicks. Although it is not intended as an indictment on the competence of the programmer, I’m starting to think that expecting people to not take offense at this style of code review is betting against human nature. On the other hand, if you are in an environment where everyone accepts such level of detailed reviews, that significantly softens the blow, making it much easier to focus on the substance of the comments.</p>
+<p>I personally benefited greatly from code reviews, especially ones from more senior engineers. Amidst the nitpicks is usually some words of wisdom. Once in a while, there would also be a comment that mentions an unfamiliar concept, which is when the real learning happens. Many newer C++ features fall into this category.</p>
+<p>Google’s internal tooling for code reviews (Critique) is also excellent and something I wish were more widely available. It makes it easy to keep track of long threads of comments through multiple versions of code changes, even after rebasing unrelated changes into the pull request. This is not something that GitHub / Gitlab does very well. It also automatically suggests appropriate reviewers, and keeps track of whose turn it is to take action through multiple rounds of back-and-forth. This is all to encourage detailed discussions of every aspect of the code under review.</p>
+<h3 id="building-reliable-software">Building Reliable Software</h3>
+<p>This one mostly stems from working with SREs and observing their work. In infrastructure teams, there tends to be a lot of emphasis on reliability. Reliability work has a very long feedback loop, so you only start to see the payoff after maybe year two or three. I’m glad I stuck around for that long.</p>
+<p>There were several ingredients to how we operated the service that made it reliable. In no particular order:</p>
+<ul>
+<li>Slow rollouts. Whenever there is a large feature, phase its rollout over long periods of time, weeks or maybe even months. This can be painful for the developer shipping shiny features, but if you can afford to wait, nothing beats “taking it slow”.</li>
+<li>Redirect complexity. Complexity leads to hairy, system-level bugs that no automated tooling can catch and takes a long time to troubleshoot. This hurts reliability. I was going to put “avoid complexity” here, but that isn’t always possible, especially when you have a team of brilliant engineers faced with ever changing requirements. However, you can manage that complexity by tucking some away in a corner, pushing it out to a different system, etc. The more critical the system, the simpler it should be. Simple also tends to mean fast.</li>
+<li>Consensus is hard, slow, and a fundamental design decision for a system. Don’t use leadership election if you can help it. Make local decisions and use eventual consistency. <a href="https://crdt.tech/">CRDT</a> is a thing. Use <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">fencing</a> if you have to use leadership election.</li>
+<li>Cut down on dependencies. Both external system dependencies and software library dependencies. Fewer dependencies translate to more reliable software. This is a philosophy I find it somewhat difficult to sell to other engineers in the era of the Cloud, micro-services, and extremely complex build systems.</li>
+<li>Vertical scaling. One machine can do a lot if you know how to squeeze it, and maintain great uptime in the process. Do your thing in a handful of machines so you don’t have to deal with giant compute clusters (unless you are running offline MapReduce-like workloads) where machine failures are the norm.</li>
+<li>Test. There are never enough tests. Write unit tests, component-level tests, single-process system-level tests, multi-process integration tests, multi-service staging tests. A good tech lead never says no to a new test. Tests allow you to move fast and be confident of changes. Everybody should write tests, even if you have a dedicated QA team.</li>
+</ul>
+<p>There are also many standard SREs practices for monitoring, probing, alerting, incident response, post-mortems, etc. Those have been described in detail in Google’s <a href="https://sre.google/books/">SRE books</a>, so I’ll simply direct the reader to the relevant chapters.</p>
+<p>In short, though, many of the above points boil down to &ldquo;do the boring thing that works&rdquo;.</p>
+<h3 id="think-before-you-act">Think Before You Act</h3>
+<p>I don’t know if this is an official aspect of Google’s engineering culture, but the company encourages a culture of thinking before executing. Write a design document, get it reviewed, then implement it. Study a library thoroughly, see how it’s used, know its caveats, how it can be tested, then use it. Write walls of text in code reviews, argue about something at length, then change that one line of code. It may be that a lot of early folks at Google come from an academic background where research is heavily emphasized.</p>
+<p>This culture improved my ability to do research on a daily basis. I had an improved threshold of information intake before I felt the need to execute, and a better sense of when I’ve absorbed enough knowledge to be a little confident in what I have to say about a topic. Of course, one also gets better at writing design docs in the process.</p>
+<p>With the plethora of StackOverflow and GPTs today, it’s easy to get a lot done without ever understanding something deeply, so it becomes more difficult to get into the habit of slowing down, doing your own research, evaluating tradeoffs, proposing a solution, and only then implementing it. In the long run, it pays to fight the impulse of delivering projects as soon as possible to train your understanding and second-order thinking skills. Context learned this way is also frequently transferable to other problems, increasing your domain expertise.</p>
+<h3 id="everything-is-medium-hard">&ldquo;Everything is Medium Hard&rdquo;</h3>
+<p>There’s a common saying among Google engineers: Everything is medium hard; impossible things are possible. This is both a testament to the impressive infrastructure of the company and a reflection of its complexities. The second half is easy to understand, especially considering Google&rsquo;s earlier innovations: perhaps a good example of this is the <a href="https://research.google/pubs/spanner-truetime-and-the-cap-theorem/">TrueTime API</a> which made it possible for Spanner to skirt around the CAP theorem. I’ve grown to be very cautious around the word “impossible” at work - it’s tempting to say it and feel good about the impeccable chain of reasoning that led you there, but usually, in software engineering, impossible just means you haven’t gathered enough context to consider all the potential solutions, or you are solving the wrong problem.</p>
+<p>“Everything is medium hard” is, in my opinion, the more interesting part of the story. It frequently happens that something simple at first glance may turn out to be a week-long endeavor. A few examples:</p>
+<ol>
+<li>
+<p>Let&rsquo;s say Bob the junior developer wants to roll out an exciting new feature. Seems simple at first. Just update some configurations and let SREs handle the rest, right? What actually might end up happening is the following:</p>
+<ul>
+<li>Bob learns an unfamiliar, Python-like-but-not-quite <a href="https://en.wikipedia.org/wiki/Domain-specific_language">DSL</a> for configuration management. This takes a day.</li>
+<li>Bob updates the actual configuration script which is spread across many files, with thousands of lines of code and classes with complex inheritance relationships. This takes half a day.</li>
+<li>Bob gets the configuration change reviewed by a senior SRE. The senior SRE is busy and takes some time to reply. When they finally do, they write many comments, all with solid reasoning, that need to be addressed by Bob.</li>
+<li>Bob works through the comments, and get the change approved. Bob has to fight the CI system a bit since there are unrelated things that looks broken but doesn&rsquo;t actually matter.</li>
+<li>Bob merges the change. He then wonders when the change will actually go into production.</li>
+<li>Bob discovers a world of rollout management tools and consoles. He learns about dev, staging, production environments and hundreds of Google data centers. He learns about rollout waves. It turns out there is no central webpage that displays clearly when / where each change will be, so he sifts through tens of web consoles to figure this all out.</li>
+</ul>
+</li>
+<li>
+<p>Bob wants to add a monitoring dashboard. Seems simple at first - just click a few buttons on the monitoring page. Here&rsquo;s how that goes:</p>
+<ul>
+<li>The old monitoring system is deprecated, and the new one hasn’t been setup yet for your team.</li>
+<li>Bob follows a tutorial to learn another DSL for creating dashboards.</li>
+<li>Bob sets up a new folder of dashboards for his team with an appropriate OWNERS file, then writes some boilerplate code, and finally the dashboard itself.</li>
+<li>To test it, Bob spin up a tiny <a href="https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/">Borg</a> server to run a mini monitoring system and looks at the dashboards.</li>
+<li>Preferably, there should be a unit test for the dashboard (yes, dashboards are written in code, and code needs tests), but Bob can&rsquo;t be bothered to write it.</li>
+<li>Bob sends the change to his colleague for review.</li>
+<li>The colleague doesn&rsquo;t understand any of it and asks some clarifying questions. Bob patiently answers. The colleague approves the change and the change goes in.</li>
+<li>The dashboard is live!</li>
+<li>It looks like the dashboard doesn&rsquo;t handle some production data very well. It turns out it&rsquo;s missing a filter and mixing data from staging / prod environments.</li>
+<li>Bob writes another change, tests it, gets it reviewed, and merges it.</li>
+<li>The dashboard is finally done, for now.</li>
+</ul>
+</li>
+<li>
+<p>Bob notices a seemingly simple TODO that someone left in the comments to refactor class X slightly, and being a good engineer, decides to finish it. Unfortunately, Bob didn&rsquo;t consider why that person chose to leave the TODO despite being a perfectly capable engineer - because it’s not an easy task! Here are some possibilities:</p>
+<ul>
+<li>Perhaps the refactor touches some library code that affects some downstream teams, which means it could hit <a href="https://www.hyrumslaw.com/">Hyrum’s Law</a>. Bob would need to run the a global CI test to verify other teams&rsquo; functionality still works, which takes a whole day for each iteration. In the worst case, the change could lead to a production outage and a post-mortem.</li>
+<li>Perhaps the refactor is a breaking change for Bob&rsquo;s own team, and would break a hundred tests, or a handful of really complex tests, which takes days to fix.</li>
+<li>Perhaps the refactor is against the preference of Bob&rsquo;s tech lead, and the TL will yell at him for deviating from the team&rsquo;s style guide.</li>
+</ul>
+</li>
+</ol>
+<p>You&rsquo;ll notice that &ldquo;everything is medium hard&rdquo; embodies many frustration-inducing experiences, directly or indirectly caused by Google&rsquo;s massive code base and army of software engineers. Despite the above, I think a lot of people speak of &ldquo;everything is medium hard&rdquo; endearingly. Things are usually medium-hard for very good reason, once you exercise some empathy and take the time to appreciate them. In addition, this trains one to expect a base level of difficulty for any task, which helps with the aforementioned “think before you act” mentality, which improves one&rsquo;s odds of solving actually difficult problems in the long term. A lot of software engineering, even outside of Google, <em>should be</em> medium hard. If something is extremely easy, very often it means an important piece of work is missing or being ignored (e.g. accruing technical debt), and will have to be paid for, with interest, later down the road.</p>
+<h2 id="epilogue">Epilogue</h2>
+<p>This article is already quite long and mostly consists of my own ramblings, so I&rsquo;ll stop here. There is more to be talked about. Perhaps we&rsquo;ll continue another time.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

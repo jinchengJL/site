@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Protocol Buffers are Great, Except... | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Protocol Buffers are Great, Except&hellip;</span></h1>
+
+<h2 class="date">2025/12/26</h2>
+</div>
+
+<main>
+<h2 id="intro">Intro</h2>
+<p>Serialization is one of those things that&rsquo;s really tempting to build - it&rsquo;s a constrained problem, has a simple abstraction with lots of depth behind it, is domain-specific so general-purpose solutions leave something to be desired, is relatively easy to test, and can be built and productionized within a reasonable amount of time by a solo engineer. As evidence, I can recall at least 10 different popular serialization formats off the top of my head: Protocol Buffers, JSON, BSON, MsgPack, Cap&rsquo;n Proto, FlatBuffers, Simple Binary Encoding (SBE), cereal, Avro, Thrift, Arrow Flight, etc. And I&rsquo;m sure this is missing a large number of alternatives.</p>
+<p>In this post, I&rsquo;d like to talk about serialization &amp; schema design under a specific but rather widely applicable set of constraints:</p>
+<ul>
+<li>There is some data that I&rsquo;d like to both send from one app to another, and write to long-term storage.</li>
+<li>I&rsquo;d like serialization, data transfer, deserialization to be as fast &amp; resource efficient as possible, within reason. So concretely, (de)serialization should be fast, data size should be relatively small, data copying &amp; memory allocation should be kept to a minimum.</li>
+<li>I&rsquo;d like good schema evolution support - stored data must be backwards and forwards compatible, and I must be able to freely update schemas within some compatibility rules.</li>
+<li>I&rsquo;d like to use a somewhat widely known format, so there is community tooling and support for many languages.</li>
+</ul>
+<p>That&rsquo;s it. This is pretty much the basic requirements for communication between micro-services (whether through direct RPC or a message broker). It can also be appropriate for single-host multi-process communication, or logging structured events, or frontend-backend communication, etc.</p>
+<h2 id="the-landscape">The Landscape</h2>
+<p>Despite the common enough requirements, I don&rsquo;t think there is a satisfactory, general-purpose solution to this problem (yet).</p>
+<p>Let&rsquo;s look at a few popular options and their problems:</p>
+<ul>
+<li>JSON / BSON - Increases data size, relatively slow. Additionally, JSON lacks native support for binary data.</li>
+<li>Protocol Buffers - Fine as purely serialized data, but has a large library dependency &amp; generated code footprint, allocations everywhere, generated language-specific classes are neither fast nor easy to use for apps, lacks robust &amp; established file format for storage (closest being <a href="https://github.com/google/riegeli">Riegeli</a>).</li>
+<li>Cap&rsquo;n Proto / FlatBuffers - Closer to the ideal, but sacrifices a lot in the name of &ldquo;zero-cost deserialization&rdquo;. Schema evolution support is a little worse than Protocol Buffers, data size tends to be larger (no varint), serialization for large messages becomes slower due to data size, etc.</li>
+<li>SBE - Very fast but very barebones, poor schema evolution support so not suitable as a storage format, shares data size downsides with Cap&rsquo;n Proto &amp; FlatBuffers, uses XML as schema IDL.</li>
+</ul>
+<h2 id="what-we-want">What We Want</h2>
+<p>Going back to our original requirements, what do we really want in a serialization format, from an application&rsquo;s point of view?</p>
+<p>In terms of a balance of data size / (de)serialization speed / schema evolution support, I believe <a href="https://protobuf.dev/programming-guides/encoding/">Protocol Buffer Encoding</a> strikes quite a good balance here. It&rsquo;s got some lightweight compression via varints, great schema evolution support, encoding/decoding can be quite fast, and finally has a large community. If we consider only the wire format, it&rsquo;s difficult to beat it on all fronts. Optimizing for speed on top of Protocol Buffers Encoding usually means sacrificing data size &amp; schema evolution a little. Optimizing for data size means more compression, which sacrifices speed.</p>
+<p>Next let&rsquo;s talk about what an application really wants from Protocol Buffers but doesn&rsquo;t get automatically - fast (de)serialization, and ease of use.</p>
+<p>A typical application trying to send/receive data will likely have native in-memory types for that data defined (let&rsquo;s not worry about pure data forwarders here). With stock Protocol Buffers, the app has to maintain translation logic between the native types and the protobuf generated types, or be forced to use the generated types for business logic - neither of which is great. Instead, I&rsquo;d like the Protocol Buffers schema and native in-memory type to be seamlessly integrated. For example if I have (examples in C++ as that&rsquo;s what I work with mostly):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Order</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">double</span> price;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">int</span> qty;
+</span></span><span style="display:flex;"><span>  string order_id;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>and then the following Protocol Buffers schema:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#66d9ef">message</span> <span style="color:#a6e22e">Order</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">double</span> price <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">int32</span> qty <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">string</span> order_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>I&rsquo;d like the C++ type and the protobuf wire format to &ldquo;map&rdquo; to each other. I&rsquo;d like to be able to write:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Order order1;
+</span></span><span style="display:flex;"><span>Serialize(order1, buffer, size);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Order order2;
+</span></span><span style="display:flex;"><span>Deserialize(buffer, size, <span style="color:#f92672">&amp;</span>order2);
+</span></span></code></pre></div><p>without having to implement or maintain <code>Serialize</code>/<code>Deserialize</code> myself, or to update them when schemas change. Achieving this will require a lot of reflection - possibly in both the native language and the schema IDL. Protocol Buffers already provides excellent reflection, and popular languages either support reflection natively, or there&rsquo;s usually some way to get around the lack of reflection to <a href="https://github.com/getml/reflect-cpp">achieve it anyway</a>.</p>
+<p>Additionally, <code>Serialize</code>/<code>Deserialize</code> should be zero-allocation and minimal-copy, moving straight from native type to bytes, and vice versa. No intermediate generated types, and no memory allocation, hence the buffer+size API. This gets us close to Cap&rsquo;n Proto level performance out of Protocol Buffers.</p>
+<p>However, it&rsquo;s unrealistic to always generate <code>Serialize</code>/<code>Deserialize</code> auto-magically when between native types and serialization schemas, because wire-format schemas are not expressive enough. Native in-memory types can be much richer - maps, sets, queues, &ldquo;<a href="https://doc.rust-lang.org/rust-by-example/generics/new_types.html">newtype</a>&rdquo; types, AoS vs SoA (array-of-structs vs struct-of-arrays), etc. Perhaps I&rsquo;d like to translate the following schema:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#66d9ef">message</span> <span style="color:#a6e22e">NamedPoints</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">repeated</span> <span style="color:#66d9ef">string</span> names <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">repeated</span> <span style="color:#66d9ef">double</span> xs <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">repeated</span> <span style="color:#66d9ef">double</span> ys <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>to the following native type:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> { <span style="color:#66d9ef">int</span> x; <span style="color:#66d9ef">int</span> y; };
+</span></span><span style="display:flex;"><span>DEFINE_NEW_TYPE(Name, std<span style="color:#f92672">::</span>string);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> NamedPoints <span style="color:#f92672">=</span> unordered_map<span style="color:#f92672">&lt;</span>Name, Point<span style="color:#f92672">&gt;</span>;
+</span></span></code></pre></div><p>Trying to auto-generate <code>Serialize</code>/<code>Deserialize</code> directly becomes quite pointless in this case. Instead, a more realistic goal is to make it as easy as possible to implement a custom zero-allocation <code>Serialize</code>/<code>Deserialize</code>, based on auto-generated helpers from the message schema.</p>
+<h2 id="a-better-solution">A Better Solution</h2>
+<p>Given the above, let&rsquo;s consider what an ideal library for Protocol Buffers looks like. It should support:</p>
+<ul>
+<li>Auto-generation of per-field zero-allocation writers based on a message schema. For example, with the above Order message, there could be an <code>OrderWriter</code> class with methods <code>OrderWriter.write_price</code>, <code>OrderWriter.write_qty</code>, <code>OrderWriter.write_order_id</code>. Nested messages will require a slightly more complicated API but should be solvable.</li>
+<li>For &ldquo;simple&rdquo; schemas, direct auto-generation of the <code>Serialize()</code> method. Requirements for such simple schemas might be:
+<ul>
+<li>One-to-one field mapping between native types and protobuf schema types. No single-field to multi-field mappings, in either direction.</li>
+<li>Schema fields must have &ldquo;supported&rdquo; types - e.g. no oneof, no maps.</li>
+<li>Fields must have compatible types.</li>
+<li>Native types should be relatively boring - no special tricks like inheritance, bitfields, etc.</li>
+<li>That&rsquo;s mostly it. A lot of other things can be supported through extra protobuf annotations - missing fields, extra fields, field renaming, newtype.</li>
+</ul>
+</li>
+<li>Auto-generation of <em>visitor-style</em> API for decoding serialized messages, such that the user can supply a callback to handle each field in the message schema. <em>Require</em> users to handle every field, or compilation fails. Think something like <code>std::visit</code> for variants for C++.</li>
+<li>For simple schemas with clean per-field mapping, auto-generation of the <code>Deserialize()</code> method.</li>
+</ul>
+<p>I don&rsquo;t think this library exists today. I expect there probably are already similar closed-source libraries out there, but none open-source that I know of. The one that comes closest to the above requirements I&rsquo;ve seen is <a href="https://pigweed.dev/pw_protobuf/">Pigweed Protobuf</a>, but it is advertised as an embedded library and doesn&rsquo;t seem intended for use in servers. I&rsquo;m not sure why (except for lacking some minor feature support). It looks quite close to an ideal general purpose solution. Also it doesn&rsquo;t support the visitor-style API mentioned above.</p>
+<h3 id="caveats">Caveats</h3>
+<p>I’ve glossed over some considerations to make some points more salient. Notably, serialization requirements differ a lot between problem domains, so the requirements mentioned above aren’t always applicable.</p>
+<p>If your problem domain does not need much in terms of schema evolution, one can get true zero-copy deserialization in the vein of Cap’n Proto or something language-specific like rkyv, where the serialized format is also the in-memory format, even for complicated data structures like hash maps.</p>
+<p>If you’d like to do selective reads over serialized data (e.g. via mmap) where the data being read is a small portion of the overall corpus, or if you’d like to selective in-place mutation of the data, then something like Cap’n Proto and FlatBuffers will be better. A downside of Protocol Buffers’ compact wire format is the lack of random access, which requires scanning the entire message even for a single field.</p>
+<p>If you only work within a single language, then protocol buffers doesn’t buy much. You can use a language-specific serialization implementation which will always be more ergonomic than language-agnostic one.</p>
+<h2 id="efficient-schema-design">Efficient Schema Design</h2>
+<p>Making schemas generate fast, easy-to-use code is only part of the story. It turns out that if you want good performance out of serialization, designing schemas approriately for efficiency is just as important.</p>
+<p>As application programmers, our intuition may be to try as much as possible to have a one-to-one correspondence between our app&rsquo;s native types and the wire format schema: an int for an int, an array for a repeated field, an optional for an optional, a hash map for a protobuf map, a sub-message for a protobuf sub-message, etc.</p>
+<p>This intuition is not always the best use of protobuf schemas. While it may feel natural, ultimately native types and protobuf schemas are different things. Protobuf schemas are quite limited in their type selection and has its own quirks. For example:</p>
+<ul>
+<li>Protobuf maps are <a href="https://abseil.io/fast/hints.html#:~:text=Avoid-,protobuf,-map%20fields.">very slow</a> in generated code and causes lots of tiny memory allocations.</li>
+<li>Protobuf fields have default values that may not be the same as your native types.</li>
+<li>Marking a protobuf field &ldquo;optional&rdquo; does not prevent readers from reading its value without checks. Instead readers will still see the default value for empty optional fields, so its semantics is subtly different from native optional types.</li>
+<li>Repeated scalar fields are <a href="https://protobuf.dev/editions/features/#repeated_field_encoding">packed</a>. Repeated submessages are not packed. This leads to large wire size discrepancies between different schema designs.</li>
+<li>Integers are encoded as varints by default. Varints are great for small values. They are not so great for large values. So if you are storing high-precision timestamps as an int64, think again.</li>
+<li>Sub-messages in protobuf carry additional costs in both serialization and allocation (in generated types), so grouping related fields in a sub-message causes overhead and isn&rsquo;t purely a question of business-logic appropriateness.</li>
+</ul>
+<p>I&rsquo;m probably missing other gotchas. The overall point stands - designing protobuf schemas for performance is a very different game from designing schemas for native types.</p>
+<p>My current advice when designing protobuf schemas is the following:</p>
+<ul>
+<li>Prefer structure-of-arrays design to take advantage of packed scalar fields. You can encode a n-dimensional matrix of numbers with n+1 arrays.</li>
+<li>Default to non-optional fields. Only use optional if business logic really requires presence checks and can&rsquo;t rely on default value checks. Non-optional saves wire size and prevents gratuitous presence checks.</li>
+<li>Use sub-messages sparingly. Use repeated sub-messages even more sparingly. Prefer flat schemas.</li>
+<li>Do not use maps. Validate key uniqueness at app level.</li>
+<li>Use sfixed / fixed types for large integers.</li>
+<li>Prefer many small messages over one large message. Avoid unusually high field numbers (128+ for example).</li>
+</ul>
+<h2 id="conclusion">Conclusion?</h2>
+<p>You might expect this is where I will start shilling my own library, but there isn&rsquo;t one! You&rsquo;re welcome to build it if you agree this is a good idea. Or if you know a serialization format that readily solves all of the problems better than proposed, please do let me know.</p>
+<p>Protocol Buffers are great. Let’s use them to their fullest potential.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

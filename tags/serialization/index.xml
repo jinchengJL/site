@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Serialization on Jincheng Li</title>
+		<link>http://jincheng.li/tags/serialization/</link>
+		<description>Recent content in Serialization on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 26 Dec 2025 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/serialization/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Protocol Buffers are Great, Except...</title>
+				<link>http://jincheng.li/post/protocol-buffers-are-great/</link>
+				<pubDate>Fri, 26 Dec 2025 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/protocol-buffers-are-great/</guid>
+				<description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;&#xA;&lt;p&gt;Serialization is one of those things that&amp;rsquo;s really tempting to build - it&amp;rsquo;s a constrained problem, has a simple abstraction with lots of depth behind it, is domain-specific so general-purpose solutions leave something to be desired, is relatively easy to test, and can be built and productionized within a reasonable amount of time by a solo engineer. As evidence, I can recall at least 10 different popular serialization formats off the top of my head: Protocol Buffers, JSON, BSON, MsgPack, Cap&amp;rsquo;n Proto, FlatBuffers, Simple Binary Encoding (SBE), cereal, Avro, Thrift, Arrow Flight, etc. And I&amp;rsquo;m sure this is missing a large number of alternatives.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

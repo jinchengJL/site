@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Consistency on Jincheng Li</title>
+		<link>http://jincheng.li/tags/consistency/</link>
+		<description>Recent content in Consistency on Jincheng Li</description>
+		<generator>Hugo</generator>
+		<language>en-us</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate>
+		
+			<atom:link href="http://jincheng.li/tags/consistency/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Consistency in Shared Memory Systems and Distributed Databases</title>
+				<link>http://jincheng.li/post/consistency-comparison/</link>
+				<pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+				<guid>http://jincheng.li/post/consistency-comparison/</guid>
+				<description>&lt;p&gt;It&amp;rsquo;s well known that many distributed consistency models come from the literature on shared memory multiprocessor systems. Intuitively, both systems need to present a consistent view of asynchronously replicated data to external clients (where replication in shared memory comes from caches), and therefore share the same underpinning theory. However, subtle differences between the two lead to their adoption of distinct consistency models. This is my attempt to explain the popular solutions for each system, and some observations on where the two diverge.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

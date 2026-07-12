@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Case of Redis | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">The Case of Redis</span></h1>
+
+<h2 class="date">2025/06/25</h2>
+</div>
+
+<main>
+<p>I have a bad habit of rolling my eyes at Redis when the topic comes up at work, without really giving well-grounded arguments as to why. I wanted to collect some of my thoughts on Redis here, in the hopes of crystallizing them into something useful.</p>
+<p>Redis occupies an interesting design space. It represents a unique blend of somewhat polarizing design decisions - I suspect that without Antirez at the helm, hardly anyone else would have made the same choices that shaped Redis into what it is today. This article will examine some interesting aspects of its design, how and why it got there, observe why it works for so many people, and share some of my own perspectives.</p>
+<p>Redis is a very opinionated system. The best way I can summarize it is that its design prioritizes simplicity (or elegance) and performance, in that order, above all else. I believe this aligns with the <a href="http://oldblog.antirez.com/post/redis-manifesto.html">Redis Manifesto</a>. In particular “simplicity” here refers to implementation simplicity, not simplicity on the part of users. It’s arguably better phrased as “elegance”, which is a more intrinsic property of the system itself rather than something observable by users. This design philosophy is extremely rare in other systems. In an enterprise setting, prioritizing elegance in design is a luxury - everybody is under pressure to deliver features and achieve business outcomes, and elegance must give way to other priorities. In some ways, Redis is best understood as a vehicle for artistic expression that happens to be useful software.</p>
+<p>Let’s consider some concrete examples to illustrate the above:</p>
+<ul>
+<li>BGSAVE takes advantage of the OS copy-on-write semantics of child process memory to snapshot Redis data to disk. This has been a <a href="https://www.romange.com/2022/01/30/redis-analysis-part-2-simplicity/">well-known foot-gun</a> and the subject of many debates, but I don’t think anyone can argue against its elegance. It’s so simple yet powerful - a fork + write to leverage the power of the operating system, incurring little complexity in the Redis codebase. The core of the implementation is <a href="https://github.com/redis/redis/blob/03816c15f75962b8e4662cee22be6f7ba6d5d9dd/src/rdb.c#L1642">several hundred lines of C</a>.</li>
+<li>In the case of distributed locking, Redis offers Redlock as a solution, which implements <a href="https://redis.io/docs/latest/develop/use/patterns/distributed-locks/#the-redlock-algorithm">client-side quorum-based</a> locking. It <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">trades off linearizable consistency</a> for simplicity, performance, and availability. Incidentally it also shows that Redis places a lot of trust on the implementation quality of community client libraries.</li>
+<li>Redis remains primarily single-threaded - command execution and data manipulation tasks run in a single event loop, while network I/O and some house-keeping tasks can be parallelized by worker threads. Avoiding multi-threading eliminates a whole class of bugs and performance issues that are difficult to reason about and test for, which makes any given application vastly simpler and speeds up development. It also means we are under-utilizing CPU resources and leaving performance on the table, which is against the principle of <a href="https://mechanical-sympathy.blogspot.com/2011/07/why-mechanical-sympathy.html">mechanical sympathy</a>.</li>
+</ul>
+<p>Personally, I find a lot of the design choices of Redis to end up pushing complexity onto users (aka “batteries later”) in the name of simplicity. In order to safely operate Redis, users must know the ins-and-outs of the implementation and its associated foot-guns. BGSAVE places a lot of pressure on the OS virtual memory and VFS subsystem. Redlock requires becoming familiar with the corner cases of distributed locking. The single-threaded design means when more CPU is needed, users must resort to sharding and replication of Redis instances, which incurs more operational burden. I resonate a lot with the “<a href="https://www.mattduck.com/2021-04-a-philosophy-of-software-design.html">deep modules</a>” philosophy which advocates that implementations should try its best to hide most of the complexity from users and expose simple interfaces - it’s okay for the implementation to be complex (and well-managed internally) as long as interfaces remain simple - so a lot of the Redis designs are not something I would have chosen.</p>
+<p>To be fair, Redis does a good job of hiding complexity in a lot of areas - powerful data structures and Lua scripting come to mind. This article is not just another critique of Redis (which would be way too late to the party and tone-deaf). Let’s look at what makes Redis so popular despite its short-comings.</p>
+<p>⁠Redis <a href="https://en.wikipedia.org/wiki/Redis#History">originated</a> as a side project for a very specific need of a real-time analytics service. It needed to natively support simple “data structures” like linked lists. Antirez clearly knew the domain well, knew the limitations of traditional DBs, and came up with a very good design for it that, in retrospect, filled a niche in high-demand. A short while later Redis was open-sourced and announced on Hacker News, receiving <a href="https://redis.io/blog/redis-turns-10/">good community feedback</a>. Later on, Antirez focused on Redis development for years, received corporate sponsorship, held the community close by being very responsive and keeping design processes extremely open on his weblog. He <a href="https://groups.google.com/g/redis-db/c/Oazt2k7Lzz4/m/BwgCI_RHprcJ">replied to criticisms</a> directly with respectful and well-reasoned arguments, wrote about not only technical decisions but his perspectives on development processes and personal life experiences, and became a well-respected public figure in the open-source community. In the meantime Redis slowly but steadily gained many well-designed and well-received features: Lua scripting, Redis Sentinel, Streams, threaded I/O, AOF, etc. In other words, Redis became popular and loved because it of its great performance, unique data structures, and strong community support. The first two of these attributes are great technical achievements, but I tend to think they can be relatively easily replicated by others. It’s the community support that makes Redis what it is today.</p>
+<p>What I find invaluable from the Redis story is the lesson in software design it teaches and what it says about my own limitations. I don’t work on in-memory databases at all, and yet a lot of the points above carry over to other software design decisions. I probably would have never designed something like Redis if given the task to do so - I would have designed a multi-threaded in-memory DB with transactions, tiered storage, distributed consensus, etc, that simultaneously achieves performance, correctness, ease of use, but sacrifices a lot of internal complexity. I would not have been so good at fending off feature requests, and the product would gain lots of features that make it more difficult to maintain under the weight of complexity over time, requiring a large team to hold together. This is more or less due to my previous experience at a big tech company that prides on “doing the right thing” no matter how complex it is. Redis offers a refreshing perspective: by working closely with the community and aggressively defending simplicity as a principle, one can carve out a path for a simple, yet powerful, and widely loved product.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+

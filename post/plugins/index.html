@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Plugins, Processes, Micro-services, Mono-Repos | Jincheng Li</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Plugins, Processes, Micro-services, Mono-Repos</span></h1>
+
+<h2 class="date">2025/06/22</h2>
+</div>
+
+<main>
+<p>Plugins weren’t really much of a thing until recently in my career. Now that I&rsquo;ve been exposed to them, they seem to show up everywhere, and for good reason. For a long time, my superficial understanding of plugins was that they were a way to extend the existing functionality of a piece of software. For example, browser extensions let you extend many aspects of the web-browsing experience on top of the browser itself. The browser provides a foundation that handles much of the complexity of the web, and the plugins work off that foundation.</p>
+<p>But plugins can be much more than that. Many software systems are nothing but plugins, where nearly all of the heavy lifting is done by the plugins, and the surrounding system becomes a thin execution environment, or runtime, for the plugins. Telegraf belong in this category. <a href="https://docs.influxdata.com/telegraf/v1/plugins/">Telegraf</a> is an agent that collects telemetry on servers, and nearly all of its core functionality is driven by plugins that define the input, processing, aggregation, and output logic. In this paradigm, the plugins are the application.</p>
+<p>This latter paradigm is akin to the relationship between operating systems and application processes, where the OS provides a foundational abstraction layer for the hardware, and applications implement the functionality that end-users care about. Unlike many plugin architectures, applications are typically stand-alone processes in an operating system, which means they have isolated resources, privileges, and failure domains. An OS doesn’t trust the applications it is running, whereas a plugin runtime trusts its plugins a lot more. A lot of the time, a plugin can access all of the resources of its runtime and can crash the runtime if it misbehaves (there are counter-examples where plugins run in isolated sandboxes, but that tends to incur a runtime cost and blurs the line between plugins and standalone processes).</p>
+<p>If we zoom out a bit further, microservices also fit the same paradigm, with container orchestration frameworks as the &ldquo;runtime&rdquo; and microservices as the applications or plugins of that foundation. Microservices provide even further isolation across different applications—resources, privileges, and failure domains can now be physically isolated across different machines, data centers, and geographies. Additionally, it’s common for different microservices to be owned by entirely different teams within an organization, each exposed to different business contexts, serving different business needs, and making independent technical decisions. One of the hard-won lessons from the <a href="https://martinfowler.com/articles/microservices.html">microservice craze</a> of 2010s is that microservices are a way to scale organizations, rather than a technically superior architecture.</p>
+<p>In fact, all of the above paradigms - plugin-driven architecture, stand-alone application processes, and microservices - represent different points on the same spectrum. They are ways to scale an organization (or many organizations if you consider open-source software) with different technical trade-offs. In all three cases, we are choosing to write the interface boundaries of the system in stone (e.g. a language-specific API plus dynamic loading for plugins, IPC mechanisms in the OS for processes, and RPC frameworks and distributed message buses for microservices), in exchange for lots of flexibility in the rest of the system. Teams owning plugins, applications, and microservices each get to make independent decisions, make progress without interference, and only need minimal communication to align at interface boundaries when requirements change. This means two things:</p>
+<ul>
+<li>Interface boundaries become really difficult to change, so its up-front design is crucial and require a deep understanding of the problem domain to do reasonably well, and even well-executed solutions are rarely wholly satisfying due to the nature of software (think Internet protocol standards).</li>
+<li>Once the interface boundaries are set, teams start to organize around them and establish communication structures that mirror the software architecture. Technical architecture becomes the organizational structure, and the latter is much more difficult to break. If and when business requirements change and interface boundaries need to change, we are faced with lots of organizational pain.</li>
+</ul>
+<p>To make the organizational aspect of these architectural decisions even more concrete, consider repository structures. When poly-repo organizations split up software responsibilities across different teams, they usually do so by having each team own its own code repository. I used to naively think of a code repository as a property of the software and the hygiene habits of developers, where software with clear boundaries naturally gets split into a different repository. This is not usually the case. What happens more often is Conway’s Law, where software with independent owners gets its own repository, and technical interface boundaries grow in tandem with that. Repositories come with different CI pipelines, coding styles, approval rules, issue trackers, programming languages, technical designs, contexts, etc., which together create enough friction for a human to navigate with ease. This solidifies communication boundaries in an organization, such that if a team requires a change in another team’s repository, they tend to ask that team to do it instead of directly contributing code.</p>
+<p>With mono-repos, the boundaries of separate repositories are slightly more fluid. Organizations with mono-repos tend to standardize on a single best-practice way to implement standard tooling like CI, coding style, issue tracking, etc., so the friction there is smaller. However, the same differences in approval rules, programming languages, technical designs, and contexts persist. In a contrived, purely technically driven world, one would imagine that software evolves purely based on technical merit, with boundaries eliminated as much as possible, and better designs and implementations prevailing. Code is only an implementation detail, and when business requirements change, the boundaries between these independent components can be broken down through massive but safe refactoring. Mono-repos encourage code sharing and cross-team contributions, allowing this refactoring and nudging organizations toward this world to a limited extent. Separate repositories go in the opposite direction, isolating ownership and making organizational structure more rigid.</p>
+<p>Software advances one interface boundary (and repository) at a time. As architects in both the software and organizational sense, we should aspire to draw boundaries conscientiously, with trust and autonomy in mind. When boundaries inevitably change, it helps to zoom out and consider ways to evolve the current architecture towards new requirements, rather than building an entirely new product and creating more disruption for end-users.</p>
+
+</main>
+
+  <footer>
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B68JJFZ6W"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4B68JJFZ6W');
+        }
+      </script>
+
+  
+  <hr/>
+  © 2026 Jincheng Li &lt;<a href="mailto:jincheng.jl@outlook.com">jincheng.jl@outlook.com</a>&gt; | <a href="https://www.linkedin.com/in/jincheng-li-6a772041/">LinkedIn</a> | <a href="https://x.com/jinchengJL">X</a>
+  
+  </footer>
+  </body>
+</html>
+
